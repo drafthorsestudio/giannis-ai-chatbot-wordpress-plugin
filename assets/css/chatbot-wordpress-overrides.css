@@ -56,9 +56,6 @@ body .giannis-chatbot-wrapper .app-container {
 body .giannis-chatbot-wrapper .sidebar {
     display: flex !important;
     flex-direction: column !important;
-    width: 280px !important;
-    min-width: 280px !important;
-    max-width: 280px !important;
     height: 100% !important;
     min-height: 600px !important;
     flex-shrink: 0 !important;

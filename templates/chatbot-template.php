@@ -5,8 +5,8 @@
  * This template renders the chatbot interface when the [giannis_chatbot] shortcode is used.
  * 
  * @package Giannis_AI_Chatbot
- * @since 1.0.0
- */
+ * @since 1.0.7
+ * */
 
 // Prevent direct access
 if (!defined('ABSPATH')) {
@@ -162,9 +162,9 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
 }
 
 .giannis-chatbot-wrapper .sidebar {
-    width: 280px !important;
+    /*width: 280px !important;
     min-width: 280px !important;
-    max-width: 280px !important;
+    max-width: 280px !important;*/
     background-color: rgba(0, 0, 0, 0.95) !important;
     color: #ffffff !important;
     display: flex !important;
@@ -178,7 +178,6 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
     min-width: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    background-color: #f8f9fa !important;
 }
 
 /* Bricks Builder specific overrides */

@@ -1,3 +1,8 @@
+/**
+ * Giannis AI Chatbot - WordPress Plugin JavaScript
+ * Version: 1.07
+ */
+
 // Configuration - will be loaded from server
 let SIGNPOST_API_URL;
 let TEAM_ID;
@@ -57,6 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const sendBtn = document.getElementById('sendBtn');
     const welcomeScreen = document.getElementById('welcomeScreen');
     const inputAreaContainer = document.getElementById('inputAreaContainer');
+    const chatInterface = document.getElementById('chatInterface');
     const dynamicVerb = document.getElementById('dynamicVerb');
     const dynamicSuffix = document.getElementById('dynamicSuffix');
     const newChatBtn = document.getElementById('newChatBtn');
@@ -342,7 +348,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             { verb: "Demande à", suffix: "commence par dire Salut" },
             { verb: "Pregunta a", suffix: "empieza diciendo Hola" },
             { verb: "Fragen sie", suffix: "beginnen sie mit Hallo" },
-            { verb: "اسأل", suffix: "ابدأ بقول مرحb" }
+            { verb: "اسأل", suffix: "ابدأ بقول مرحب" }
         ];
 
         let index = 0;
@@ -660,8 +666,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function scrollToBottom() {
+        // Scroll the chat messages container itself
         chatMessages.scrollTop = chatMessages.scrollHeight;
-        window.scrollTo(0, document.body.scrollHeight);
+        
+        // For the window scroll, add offset for header
+        const headerOffset = getHeaderOffset();
+        const chatBottom = chatMessages.getBoundingClientRect().bottom;
+        
+        // Only scroll the window if needed (when chat extends beyond viewport)
+        if (chatBottom > window.innerHeight) {
+            const scrollTarget = window.pageYOffset + (chatBottom - window.innerHeight) + 20; // 20px buffer
+            window.scrollTo({
+                top: scrollTarget - headerOffset,
+                behavior: 'smooth'
+            });
+        }
+    }
+
+    // Helper function to determine header offset based on screen size
+    function getHeaderOffset() {
+        const width = window.innerWidth;
+        
+        if (width <= 768) {
+            // Mobile: typically larger headers
+            return 120; // Adjust this value based on your mobile header height
+        } else if (width <= 1024) {
+            // Tablet
+            return 60; // Adjust for tablet header
+        } else {
+            // Desktop
+            return 100; // Adjust for desktop header
+        }
     }
 
     function parseContent(text) {
@@ -713,9 +748,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     function initializeTheme() {
         const savedTheme = localStorage.getItem('giannis_theme');
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const wrapper = document.querySelector('.giannis-chatbot-wrapper');
 
         if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-            document.body.classList.add('dark-mode');
+            if (wrapper) wrapper.classList.add('dark-mode');
             updateThemeIcon(true);
         } else {
             updateThemeIcon(false);
@@ -723,7 +759,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function toggleTheme() {
-        const isDark = document.body.classList.toggle('dark-mode');
+        const wrapper = document.querySelector('.giannis-chatbot-wrapper');
+        if (!wrapper) return;
+        
+        const isDark = wrapper.classList.toggle('dark-mode');
         localStorage.setItem('giannis_theme', isDark ? 'dark' : 'light');
         updateThemeIcon(isDark);
     }
@@ -731,32 +770,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     function updateThemeIcon(isDark) {
         const themeIcon = document.getElementById('themeIcon');
         const welcomeLogoImg = document.getElementById('welcomeLogoImg');
+        const chatInterface = document.getElementById('chatInterface');
+        const pluginUrl = giannisConfig.pluginUrl || '';
 
         if (isDark) {
             // Moon icon
-            themeIcon.innerHTML = `
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            `;
-            // Change welcome logo to grey version in dark mode
-            if (welcomeLogoImg) {
-                welcomeLogoImg.src = 'giannis-logo-grey.png';
+            if (themeIcon) {
+                themeIcon.innerHTML = `
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                `;
             }
+            // Change logos to grey version in dark mode
+            if (welcomeLogoImg && welcomeLogoImg.src.includes('giannis-logo.png')) {
+                welcomeLogoImg.src = welcomeLogoImg.src.replace('giannis-logo.png', 'giannis-logo-grey.png');
+            }
+            // Change chat interface background in dark mode
+            if (chatInterface) {
+                chatInterface.style.backgroundColor = '#0a0b0b';
+            }
+            
         } else {
             // Sun icon
-            themeIcon.innerHTML = `
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            `;
-            // Change welcome logo back to yellow version in light mode
-            if (welcomeLogoImg) {
-                welcomeLogoImg.src = 'giannis-logo.png';
+            if (themeIcon) {
+                themeIcon.innerHTML = `
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                `;
+            }
+            // Change logos back to yellow version in light mode
+            if (welcomeLogoImg && welcomeLogoImg.src.includes('giannis-logo-grey.png')) {
+                welcomeLogoImg.src = welcomeLogoImg.src.replace('giannis-logo-grey.png', 'giannis-logo.png');
+            }
+            // Change chat interface background in light mode
+            if (chatInterface) {
+                chatInterface.style.backgroundColor = '#f8f9fa';
             }
         }
     }
@@ -798,4 +852,3 @@ window.copyToClipboard = function (button) {
         document.body.removeChild(textArea);
     });
 };
-
