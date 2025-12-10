@@ -546,52 +546,67 @@
     transition: transform var(--transition-spring);
 }
 
-/* ================================================
-   CHAT INTERFACE
-   ================================================ */
-.giannis-chatbot-wrapper .chat-interface {
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    position: relative !important;
-    overflow: hidden !important;
-    min-width: 0 !important;
+/* Clear All Chats Button - Destructive Action */
+.clear-all-btn {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-base);
+    width: 40px;
+    height: 40px;
 }
 
-/* Mobile Header */
-.giannis-chatbot-wrapper .mobile-header {
-    display: none !important;
-    padding: 1rem !important;
-    background: var(--bg-sidebar) !important;
-    color: var(--text-on-dark) !important;
-    border-bottom: 1px solid var(--border-light) !important;
+.clear-all-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.5);
+    transform: scale(1.05);
 }
 
-/* Chat Messages */
-.giannis-chatbot-wrapper .chat-messages {
-    flex: 1 !important;
-    overflow-y: auto !important;
-    padding: 2rem 0 15rem 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 2rem !important;
-    background: transparent !important;
+.clear-all-btn:active {
+    transform: scale(0.95);
 }
 
-.giannis-chatbot-wrapper .chat-messages.hidden {
-    display: none !important;
+.clear-all-btn svg {
+    width: 20px;
+    height: 20px;
+    transition: all var(--transition-base);
 }
 
-/* Welcome Container */
-.giannis-chatbot-wrapper .welcome-container {
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    text-align: center !important;
-    transition: opacity var(--transition-slow), visibility var(--transition-slow);
-    z-index: 1 !important;
-    pointer-events: none !important;
+.clear-all-btn:hover svg {
+    color: #ef4444;
+}
+
+/* Main Chat Area - Updated class to match HTML */
+.chat-interface {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.mobile-header {
+    display: none;
+    padding: 1rem;
+    background: var(--bg-sidebar);
+    color: var(--text-on-dark);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem 0 10rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
 .giannis-chatbot-wrapper .welcome-container.hidden {
@@ -857,10 +872,71 @@
     background: linear-gradient(180deg, rgba(248, 249, 250, 0) 0%, var(--bg-body) 40%) !important;
 }
 
-.giannis-chatbot-wrapper .input-area {
-    max-width: 900px !important;
-    margin: 0 auto !important;
-    width: 100% !important;
+/* Quick Starter Language Buttons */
+.language-starters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 0;
+    margin-bottom: 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.language-starters::-webkit-scrollbar {
+    display: none;
+}
+
+.language-starters.hidden-starters {
+    display: none !important;
+}
+
+.starter-chip {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-medium);
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 0.9em;
+    font-family: var(--font-family);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.starter-chip:hover {
+    background: rgba(255, 194, 14, 0.15);
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 194, 14, 0.2);
+}
+
+.starter-chip:active {
+    transform: translateY(0);
+}
+
+/* Dark mode adjustments for starter chips */
+body.dark-mode .starter-chip {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: var(--text-primary);
+}
+
+body.dark-mode .starter-chip:hover {
+    background: rgba(255, 194, 14, 0.2);
+    border-color: var(--accent-color);
+}
+
+.input-area {
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 /* Input Wrapper */
@@ -1103,71 +1179,32 @@
     }
 }
 
-/* ================================================
-   OVERRIDE COMMON WORDPRESS THEME STYLES
-   ================================================ */
-
-/* Reset common button overrides */
-.giannis-chatbot-wrapper button,
-.giannis-chatbot-wrapper button:focus,
-.giannis-chatbot-wrapper button:active,
-.giannis-chatbot-wrapper button:hover {
-    box-shadow: none !important;
-    text-shadow: none !important;
-    filter: none !important;
+    .welcome-text {
+        font-size: var(--font-size-2xl);
+    }
 }
 
-/* Override Bricks Builder specific styles */
-#brx-content .giannis-chatbot-wrapper button,
-.brx-body .giannis-chatbot-wrapper button,
-.bricks-is-frontend .giannis-chatbot-wrapper button {
-    background-image: none !important;
-    text-indent: 0 !important;
+/* ===================================
+   RTL (Right-to-Left) Support
+   Applies to Arabic text content
+   =================================== */
+.rtl-message {
+    /* Force text direction from right to left */
+    direction: rtl;
+
+    /* Align text to the right */
+    text-align: right;
+
+    /* Ensure RTL characters are handled correctly */
+    unicode-bidi: embed;
 }
 
-/* Force proper flexbox behavior */
-#brx-content .giannis-chatbot-wrapper .app-container,
-.brx-body .giannis-chatbot-wrapper .app-container {
-    display: flex !important;
-    flex-direction: row !important;
+/* RTL adjustments for bot messages */
+.bot-message .rtl-message {
+    /* Text flows correctly within the bubble */
 }
 
-/* Ensure inputs don't inherit weird padding */
-.giannis-chatbot-wrapper input,
-.giannis-chatbot-wrapper textarea,
-.giannis-chatbot-wrapper button {
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    appearance: none !important;
-}
-
-/* Force SVG display */
-.giannis-chatbot-wrapper svg {
-    display: inline-block !important;
-    vertical-align: middle !important;
-    fill: currentColor;
-}
-
-/* Ensure links in the chatbot don't get theme styles */
-.giannis-chatbot-wrapper a,
-.giannis-chatbot-wrapper a:hover,
-.giannis-chatbot-wrapper a:focus,
-.giannis-chatbot-wrapper a:visited {
-    box-shadow: none !important;
-    text-shadow: none !important;
-    background-image: none !important;
-}
-
-/* Prevent theme typography from affecting chatbot */
-.giannis-chatbot-wrapper h1,
-.giannis-chatbot-wrapper h2,
-.giannis-chatbot-wrapper h3,
-.giannis-chatbot-wrapper h4,
-.giannis-chatbot-wrapper h5,
-.giannis-chatbot-wrapper h6,
-.giannis-chatbot-wrapper p,
-.giannis-chatbot-wrapper span,
-.giannis-chatbot-wrapper div {
-    font-family: inherit !important;
-    line-height: inherit !important;
+/* RTL adjustments for user messages */
+.user-message .rtl-message {
+    /* Right alignment is crucial for user messages in Arabic */
 }

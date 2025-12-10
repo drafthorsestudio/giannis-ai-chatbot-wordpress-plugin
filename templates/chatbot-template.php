@@ -76,6 +76,17 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
                     </svg>
                 </button>
 
+                <!-- Clear All Chats Button -->
+                <button class="clear-all-btn" id="chatbot-clear-all" title="<?php esc_attr_e('Cancella tutte le chat', 'giannis-ai-chatbot'); ?>">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                </button>
+
                 <button class="sidebar-toggle" id="sidebarToggle" aria-label="<?php esc_attr_e('Toggle Sidebar', 'giannis-ai-chatbot'); ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -110,6 +121,16 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
 
             <div class="input-area-container centered" id="inputAreaContainer">
                 <div class="input-area">
+                    <!-- Quick Starter Buttons (visible only when chat is empty) -->
+                    <div class="language-starters" id="languageStarters">
+                        <button type="button" class="starter-chip" data-message="Hi">EN Hi 👋</button>
+                        <button type="button" class="starter-chip" data-message="Ciao">IT Ciao 👋</button>
+                        <button type="button" class="starter-chip" data-message="Hola">ES Hola 👋</button>
+                        <button type="button" class="starter-chip" data-message="Bonjour">FR Bonjour 👋</button>
+                        <button type="button" class="starter-chip" data-message="Hallo">DE Hallo 👋</button>
+                        <button type="button" class="starter-chip" data-message="مرحبا">AR مرحبا 👋</button>
+                    </div>
+                    
                     <form id="chatForm" class="chat-form">
                         <div class="input-wrapper">
                             <textarea id="userInput" placeholder="<?php esc_attr_e('Message Giannis...', 'giannis-ai-chatbot'); ?>" rows="1"></textarea>
