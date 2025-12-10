@@ -116,6 +116,49 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Quick Starter Language Buttons
+    const languageStarters = document.getElementById('languageStarters');
+    const starterChips = document.querySelectorAll('.starter-chip');
+
+    // Function to update starters visibility
+    function updateStartersVisibility() {
+        if (!languageStarters) return;
+
+        // Show starters only if chat is empty (no messages and it's a new chat)
+        if (isFirstMessage && chatMessages.children.length === 0) {
+            languageStarters.classList.remove('hidden-starters');
+        } else {
+            languageStarters.classList.add('hidden-starters');
+        }
+    }
+
+    // Initialize starters visibility
+    updateStartersVisibility();
+
+    // Add click listeners to starter chips
+    starterChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            const message = chip.getAttribute('data-message');
+            if (message) {
+                // Set the message in the input field
+                userInput.value = message;
+
+                // Enable send button
+                sendBtn.removeAttribute('disabled');
+
+                // Hide starters immediately
+                if (languageStarters) {
+                    languageStarters.classList.add('hidden-starters');
+                }
+
+                // Trigger form submission
+                chatForm.dispatchEvent(new Event('submit'));
+
+                console.log(`🚀 Quick starter used: "${message}"`);
+            }
+        });
+    });
+
     // Auto-resize textarea
     userInput.addEventListener('input', function () {
         this.style.height = 'auto';
@@ -213,6 +256,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Restart animation
         startDynamicTextAnimation();
+
+        // Show quick starters again
+        updateStartersVisibility();
     }
 
     function loadChat(chatId) {
@@ -237,6 +283,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Update Sidebar Active State
         renderSidebar();
+
+        // Hide quick starters (existing chat has messages)
+        updateStartersVisibility();
     }
 
     function saveMessageToState(role, content) {

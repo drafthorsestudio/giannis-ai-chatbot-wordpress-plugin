@@ -121,6 +121,16 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
 
             <div class="input-area-container centered" id="inputAreaContainer">
                 <div class="input-area">
+                    <!-- Quick Starter Buttons (visible only when chat is empty) -->
+                    <div class="language-starters" id="languageStarters">
+                        <button type="button" class="starter-chip" data-message="Hi">EN Hi 👋</button>
+                        <button type="button" class="starter-chip" data-message="Ciao">IT Ciao 👋</button>
+                        <button type="button" class="starter-chip" data-message="Hola">ES Hola 👋</button>
+                        <button type="button" class="starter-chip" data-message="Bonjour">FR Bonjour 👋</button>
+                        <button type="button" class="starter-chip" data-message="Hallo">DE Hallo 👋</button>
+                        <button type="button" class="starter-chip" data-message="مرحبا">AR مرحبا 👋</button>
+                    </div>
+                    
                     <form id="chatForm" class="chat-form">
                         <div class="input-wrapper">
                             <textarea id="userInput" placeholder="<?php esc_attr_e('Message Giannis...', 'giannis-ai-chatbot'); ?>" rows="1"></textarea>
