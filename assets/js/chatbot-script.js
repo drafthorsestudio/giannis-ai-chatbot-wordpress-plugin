@@ -4,6 +4,13 @@ let TEAM_ID;
 let AGENT_ID;
 let configLoaded = false;
 
+// RTL Detection Function - Detects Arabic script characters
+function isRTL(text) {
+    // Check for Arabic script characters (Arabic, Arabic Supplement, Arabic Extended-A)
+    const rtlPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+    return rtlPattern.test(text);
+}
+
 // Load configuration from WordPress
 async function loadConfig() {
     try {
@@ -17,9 +24,9 @@ async function loadConfig() {
                 nonce: giannisConfig.nonce
             })
         });
-        
+
         const result = await response.json();
-        
+
         if (result.success) {
             SIGNPOST_API_URL = result.data.SIGNPOST_API_URL;
             TEAM_ID = result.data.TEAM_ID;
@@ -556,6 +563,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (role === 'bot' && !skipTypewriter) {
             // Create a wrapper for content (excluding copy button)
             const contentWrapper = document.createElement('div');
+
+            // Apply RTL class if Arabic text is detected
+            if (isRTL(text)) {
+                contentWrapper.classList.add('rtl-message');
+            }
+
             messageContent.insertBefore(contentWrapper, copyBtn);
 
             // Start typewriter effect
@@ -568,6 +581,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             // For user messages OR loaded messages, show immediately
             const contentWrapper = document.createElement('div');
+
+            // Apply RTL class if Arabic text is detected
+            if (isRTL(text)) {
+                contentWrapper.classList.add('rtl-message');
+            }
+
             contentWrapper.innerHTML = formattedContent;
             messageContent.insertBefore(contentWrapper, copyBtn);
         }

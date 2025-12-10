@@ -1018,3 +1018,28 @@ textarea::placeholder {
         font-size: var(--font-size-2xl);
     }
 }
+
+/* ===================================
+   RTL (Right-to-Left) Support
+   Applies to Arabic text content
+   =================================== */
+.rtl-message {
+    /* Force text direction from right to left */
+    direction: rtl;
+
+    /* Align text to the right */
+    text-align: right;
+
+    /* Ensure RTL characters are handled correctly */
+    unicode-bidi: embed;
+}
+
+/* RTL adjustments for bot messages */
+.bot-message .rtl-message {
+    /* Text flows correctly within the bubble */
+}
+
+/* RTL adjustments for user messages */
+.user-message .rtl-message {
+    /* Right alignment is crucial for user messages in Arabic */
+}
