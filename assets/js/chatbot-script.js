@@ -549,6 +549,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             </button>
         ` : '';
 
+
+
         messageDiv.innerHTML = `
             <div class="message-avatar">${avatar}</div>
             <div class="message-content">
@@ -584,6 +586,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Create a wrapper for content (excluding copy button)
             const contentWrapper = document.createElement('div');
 
+            // CRITICAL: Store raw markdown for copy functionality
+            contentWrapper.setAttribute('data-raw-markdown', text);
+
             // Apply RTL class if Arabic text is detected
             if (isRTL(text)) {
                 contentWrapper.classList.add('rtl-message');
@@ -601,6 +606,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             // For user messages OR loaded messages, show immediately
             const contentWrapper = document.createElement('div');
+
+            // CRITICAL: Store raw markdown for copy functionality
+            contentWrapper.setAttribute('data-raw-markdown', text);
 
             // Apply RTL class if Arabic text is detected
             if (isRTL(text)) {
@@ -801,19 +809,57 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// Global Copy to Clipboard Function
+// Global Copy to Clipboard Function - Preserves Markdown Formatting
 window.copyToClipboard = function (button) {
+    const messageElement = button.closest('.message');
     const messageContent = button.parentElement;
-    // Get text content, excluding the copy button
-    const textToCopy = messageContent.textContent.replace(/Copy message/g, '').trim();
+    let textToCopy = '';
+
+    // PRIORITY 1: Find element with data-raw-markdown attribute
+    const rawMarkdownElement = messageContent.querySelector('[data-raw-markdown]');
+
+    if (rawMarkdownElement && rawMarkdownElement.getAttribute('data-raw-markdown')) {
+        textToCopy = rawMarkdownElement.getAttribute('data-raw-markdown');
+        console.log('✅ Copiato da data-raw-markdown (formattazione Markdown preservata)');
+    } else if (messageElement && messageElement.dataset.rawMarkdown) {
+        // PRIORITY 2: Fallback to messageElement dataset (legacy)
+        textToCopy = messageElement.dataset.rawMarkdown;
+        console.log('✅ Copiato da dataset.rawMarkdown (legacy)');
+    } else {
+        // PRIORITY 3: Extract text from HTML with proper line breaks
+        console.log('⚠️ Fallback: estrazione da HTML');
+        const clone = messageContent.cloneNode(true);
+
+        // Remove copy button from clone
+        const copyBtn = clone.querySelector('.copy-btn');
+        if (copyBtn) copyBtn.remove();
+
+        // Replace block elements with newlines
+        clone.querySelectorAll('br').forEach(br => br.replaceWith('\n'));
+        clone.querySelectorAll('p, div, li').forEach(el => {
+            el.prepend(document.createTextNode('\n'));
+        });
+
+        textToCopy = clone.textContent.trim();
+    }
+
+    // Store original icon HTML
+    const originalIcon = button.innerHTML;
+    const checkmarkIcon = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+    `;
 
     // Copy to clipboard using modern API
     navigator.clipboard.writeText(textToCopy).then(() => {
-        // Visual feedback
+        // Visual feedback - change to checkmark
+        button.innerHTML = checkmarkIcon;
         button.classList.add('copied');
 
         // Reset after 2 seconds
         setTimeout(() => {
+            button.innerHTML = originalIcon;
             button.classList.remove('copied');
         }, 2000);
     }).catch(err => {
@@ -827,8 +873,10 @@ window.copyToClipboard = function (button) {
         textArea.select();
         try {
             document.execCommand('copy');
+            button.innerHTML = checkmarkIcon;
             button.classList.add('copied');
             setTimeout(() => {
+                button.innerHTML = originalIcon;
                 button.classList.remove('copied');
             }, 2000);
         } catch (err) {
