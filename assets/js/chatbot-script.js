@@ -96,6 +96,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         startNewChat();
     });
 
+    // Clear All Chats Button
+    const clearAllBtn = document.getElementById('chatbot-clear-all');
+    if (clearAllBtn) {
+        clearAllBtn.addEventListener('click', () => {
+            if (confirm('Sei sicuro di voler cancellare tutte le conversazioni? Questa azione non può essere annullata.')) {
+                // Clear all chats from localStorage
+                chats = [];
+                localStorage.removeItem('giannis_chats');
+
+                // Re-render empty sidebar
+                renderSidebar();
+
+                // Reset to new chat state
+                startNewChat();
+
+                console.log('✅ Tutte le chat sono state cancellate');
+            }
+        });
+    }
+
     // Auto-resize textarea
     userInput.addEventListener('input', function () {
         this.style.height = 'auto';

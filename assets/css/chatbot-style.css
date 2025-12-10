@@ -500,6 +500,43 @@ body {
     transition: transform var(--transition-spring);
 }
 
+/* Clear All Chats Button - Destructive Action */
+.clear-all-btn {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-base);
+    width: 40px;
+    height: 40px;
+}
+
+.clear-all-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.5);
+    transform: scale(1.05);
+}
+
+.clear-all-btn:active {
+    transform: scale(0.95);
+}
+
+.clear-all-btn svg {
+    width: 20px;
+    height: 20px;
+    transition: all var(--transition-base);
+}
+
+.clear-all-btn:hover svg {
+    color: #ef4444;
+}
+
 /* Main Chat Area - Updated class to match HTML */
 .chat-interface {
     flex: 1;
