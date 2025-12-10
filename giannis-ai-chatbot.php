@@ -3,7 +3,7 @@
  * Plugin Name: Giannis AI Chatbot
  * Plugin URI: https://antitraffickingresponse.org
  * Description: A modern AI chatbot interface powered by Signpost AI
- * Version: 1.0.1
+ * Version: 1.0.7
  * Author: IRC AT
  * Author URI: https://antitraffickingresponse.org
  * License: GPL v2 or later
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('GIANNIS_CHATBOT_VERSION', '1.0.1');
+define('GIANNIS_CHATBOT_VERSION', '1.0.6');
 define('GIANNIS_CHATBOT_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('GIANNIS_CHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -55,12 +55,10 @@ class Giannis_AI_Chatbot {
     }
     
     public function enqueue_assets() {
-        // Always load on frontend (Bricks Builder detection doesn't work with has_shortcode)
-        // For production, you can add more specific detection
-        $load_assets = !is_admin(); // Load on all frontend pages
+        $load_assets = !is_admin();
         
         if ($load_assets) {
-            // Enqueue Google Fonts
+            // Google Fonts
             wp_enqueue_style(
                 'giannis-google-fonts',
                 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap',
@@ -68,32 +66,24 @@ class Giannis_AI_Chatbot {
                 null
             );
             
-            // Enqueue main plugin CSS
+            // Main plugin CSS with all fixes
             wp_enqueue_style(
                 'giannis-chatbot-style',
                 GIANNIS_CHATBOT_PLUGIN_URL . 'assets/css/chatbot-style.css',
                 array(),
-                GIANNIS_CHATBOT_VERSION
+                GIANNIS_CHATBOT_VERSION . '.1' // Bump version to force cache refresh
             );
             
-            // Enqueue WordPress override CSS with higher priority
-            wp_enqueue_style(
-                'giannis-chatbot-wp-overrides',
-                GIANNIS_CHATBOT_PLUGIN_URL . 'assets/css/chatbot-wordpress-overrides.css',
-                array('giannis-chatbot-style'), // Depends on main style
-                GIANNIS_CHATBOT_VERSION
-            );
-            
-            // Enqueue plugin JS
+            // JavaScript
             wp_enqueue_script(
                 'giannis-chatbot-script',
                 GIANNIS_CHATBOT_PLUGIN_URL . 'assets/js/chatbot-script.js',
                 array('jquery'),
-                GIANNIS_CHATBOT_VERSION,
+                GIANNIS_CHATBOT_VERSION . '.1', // Bump version
                 true
             );
             
-            // Pass configuration to JavaScript
+            // Pass configuration
             wp_localize_script('giannis-chatbot-script', 'giannisConfig', array(
                 'apiUrl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('giannis_chatbot_nonce'),
