@@ -1,6 +1,6 @@
 /**
  * Giannis AI Chatbot - WordPress Plugin JavaScript
- * Version: 1.07
+ * Version: 1.08
  */
 
 // Configuration - will be loaded from server
@@ -29,9 +29,9 @@ async function loadConfig() {
                 nonce: giannisConfig.nonce
             })
         });
-
+        
         const result = await response.json();
-
+        
         if (result.success) {
             SIGNPOST_API_URL = result.data.SIGNPOST_API_URL;
             TEAM_ID = result.data.TEAM_ID;
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         startNewChat();
     });
 
-    // Clear All Chats Button
+        // Clear All Chats Button
     const clearAllBtn = document.getElementById('chatbot-clear-all');
     if (clearAllBtn) {
         clearAllBtn.addEventListener('click', () => {
@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Restart animation
         startDynamicTextAnimation();
 
-        // Show quick starters again
+                // Show quick starters again
         updateStartersVisibility();
     }
 
@@ -603,9 +603,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </svg>
             </button>
         ` : '';
+        
 
-
-
+        
         messageDiv.innerHTML = `
             <div class="message-avatar">${avatar}</div>
             <div class="message-content">
@@ -916,7 +916,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 window.copyToClipboard = function (button) {
     const messageElement = button.closest('.message');
     const messageContent = button.parentElement;
-    let textToCopy = '';
+       let textToCopy = '';
 
     // PRIORITY 1: Find element with data-raw-markdown attribute
     const rawMarkdownElement = messageContent.querySelector('[data-raw-markdown]');
