@@ -207,8 +207,4 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
     flex-direction: row !important;
 }
 
-#brx-content .giannis-chatbot-wrapper .sidebar {
-    width: 280px !important;
-    flex-shrink: 0 !important;
-}
 </style>
