@@ -795,13 +795,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Alternative to handle emojis better
     function parseContent(text) {
         if (!text) return "";
 
-        // Check if text contains warning emoji and add special handling
-        const hasWarningEmoji = text.includes('⚠️') || text.includes('⚡') || text.includes('🚨');
-        
         const sourceRegex = /(\n\s*(?:Sources?|Fonti):[\s\S]*)$/i;
         const match = text.match(sourceRegex);
 
@@ -814,11 +810,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         let html = formatMarkdown(mainText);
-        
-        // If we detected warning emojis, wrap the content for better handling
-        if (hasWarningEmoji) {
-            html = `<div class="contains-emoji">${html}</div>`;
-        }
 
         if (sourcesText) {
             const cleanSources = sourcesText.trim();
@@ -834,9 +825,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return html;
     }
 
-    // Fix for the formatMarkdown function to better handle emojis and special characters
     function formatMarkdown(text) {
-        // First, properly escape HTML but preserve emojis and line breaks
         let html = text
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
@@ -844,25 +833,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
 
-        // Apply markdown formatting
         html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-        
-        // Handle line breaks more carefully
-        // Split by line breaks but preserve them
-        const lines = html.split('\n');
-        
-        // Process each line to ensure emojis don't break the layout
-        const processedLines = lines.map(line => {
-            // Wrap lines that contain emojis in a span for better control
-            if (/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|⚠️|⚡|☢️|☣️/u.test(line)) {
-                return `<span class="emoji-line">${line}</span>`;
-            }
-            return line;
-        });
-        
-        // Join with proper line breaks
-        html = processedLines.join('<br>\n');
+        html = html.replace(/\n/g, '<br>');
 
         return html;
     }

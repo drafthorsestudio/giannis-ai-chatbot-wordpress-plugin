@@ -1335,88 +1335,72 @@ body.dark-mode .starter-chip:hover {
 }
 
 /* ================================================
-   EMOJI AND SPECIAL CHARACTER FIX
+   EMOJI TEXT VISIBILITY FIX
    Prevents text from being hidden after emojis
    ================================================ */
 
-/* Fix for message content with emojis */
+/* Primary fix: Ensure message content doesn't clip text after emojis */
 .giannis-chatbot-wrapper .message-content {
-    /* Ensure proper overflow handling */
-    overflow: visible !important;
-    word-wrap: break-word !important;
-    word-break: normal !important;
-    white-space: normal !important;
+    /* Critical: Use pre-wrap to preserve whitespace but allow wrapping */
+    white-space: pre-wrap !important;
     
-    /* Fix line-height issues with emojis */
-    line-height: 1.6 !important;
-}
-
-/* Specific fix for content wrapper containing emojis */
-.giannis-chatbot-wrapper .message-content > div {
+    /* Ensure overflow is visible */
     overflow: visible !important;
-    word-wrap: break-word !important;
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    position: relative !important;
-    white-space: pre-wrap !important; /* Preserve whitespace but allow wrapping */
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    
+    /* Maintain proper line height for emojis */
+    line-height: 1.75 !important;
+    
+    /* Ensure adequate padding so nothing gets cut off */
+    padding-right: 2rem !important;
+    padding-bottom: 1.5rem !important;
 }
 
-/* Ensure emojis don't break layout */
-.giannis-chatbot-wrapper .message-content emoji,
-.giannis-chatbot-wrapper .message-content .emoji,
-.giannis-chatbot-wrapper .message-content span {
-    display: inline !important;
-    vertical-align: baseline !important;
-    line-height: inherit !important;
-    overflow: visible !important;
-}
-
-/* Fix for RTL messages with emojis */
-.giannis-chatbot-wrapper .rtl-message {
-    display: block !important;
-    width: 100% !important;
-    overflow: visible !important;
-    unicode-bidi: plaintext !important; /* Better handling of mixed LTR/RTL with emojis */
-}
-
-/* Ensure proper rendering of mixed content */
-.giannis-chatbot-wrapper .message-content br {
-    display: block !important;
-    content: "" !important;
-    margin-top: 0 !important;
-}
-
-/* Fix potential issues with strong/em tags after emojis */
-.giannis-chatbot-wrapper .message-content strong,
-.giannis-chatbot-wrapper .message-content em {
-    display: inline !important;
-    font-weight: inherit !important;
-    font-style: inherit !important;
-}
-
-.giannis-chatbot-wrapper .message-content strong {
-    font-weight: 600 !important;
-}
-
-.giannis-chatbot-wrapper .message-content em {
-    font-style: italic !important;
-}
-
-/* Ensure message content doesn't get clipped */
-.giannis-chatbot-wrapper .bot-message .message-content {
-    min-height: auto !important;
-    max-height: none !important;
-    overflow: visible !important;
-    padding-bottom: 1.5rem !important; /* Extra padding to ensure nothing is cut off */
-}
-
-/* Fix for typewriter effect with emojis */
-.giannis-chatbot-wrapper .message-content [data-raw-markdown] {
+/* Fix for the content wrapper div that contains the actual text */
+.giannis-chatbot-wrapper .message-content > div:not(.message-sources) {
     display: block !important;
     width: 100% !important;
     overflow: visible !important;
     white-space: pre-wrap !important;
-    word-break: normal !important;
-    line-height: 1.6 !important;
+    word-break: break-word !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Ensure emojis and surrounding text render properly */
+.giannis-chatbot-wrapper .message-content * {
+    /* Prevent any element from hiding overflow */
+    overflow: visible !important;
+}
+
+/* Specific fix for RTL messages that might contain emojis */
+.giannis-chatbot-wrapper .rtl-message {
+    display: block !important;
+    width: 100% !important;
+    overflow: visible !important;
+    white-space: pre-wrap !important;
+    /* Use plaintext for better mixed LTR/RTL handling */
+    unicode-bidi: plaintext !important;
+}
+
+/* Ensure the copy button doesn't interfere with text layout */
+.giannis-chatbot-wrapper .copy-btn {
+    position: absolute !important;
+    z-index: 10 !important;
+    /* Move it slightly further right to avoid overlap */
+    right: 0.5rem !important;
+    top: 0.5rem !important;
+}
+
+/* Additional safeguard for bot messages */
+.giannis-chatbot-wrapper .bot-message .message-content {
+    min-width: 200px !important;
+    max-width: 85% !important;
+    overflow: visible !important;
+}
+
+/* Fix potential font rendering issues with emojis */
+.giannis-chatbot-wrapper .message-content {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif !important;
 }
