@@ -1,6 +1,6 @@
 /**
  * Giannis AI Chatbot - WordPress Plugin Styles
- * Version: 1.0.7
+ * Version: 1.0.9
  * 
  * This stylesheet ensures the chatbot interface maintains its design
  * even when embedded in WordPress sites with aggressive theme styles
@@ -609,6 +609,54 @@
     gap: 2rem;
 }
 
+/* ================================================
+   CHAT INTERFACE
+   ================================================ */
+.giannis-chatbot-wrapper .chat-interface {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    position: relative !important;
+    overflow: hidden !important;
+    min-width: 0 !important;
+}
+
+/* Mobile Header */
+.giannis-chatbot-wrapper .mobile-header {
+    display: none !important;
+    padding: 1rem !important;
+    background: var(--bg-sidebar) !important;
+    color: var(--text-on-dark) !important;
+    border-bottom: 1px solid var(--border-light) !important;
+}
+
+/* Chat Messages */
+.giannis-chatbot-wrapper .chat-messages {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 2rem 0 15rem 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2rem !important;
+    background: transparent !important;
+}
+
+.giannis-chatbot-wrapper .chat-messages.hidden {
+    display: none !important;
+}
+
+/* Welcome Container */
+.giannis-chatbot-wrapper .welcome-container {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    text-align: center !important;
+    transition: opacity var(--transition-slow), visibility var(--transition-slow);
+    z-index: 1 !important;
+    pointer-events: none !important;
+}
+
 .giannis-chatbot-wrapper .welcome-container.hidden {
     opacity: 0 !important;
     visibility: hidden !important;
@@ -938,6 +986,11 @@ body.dark-mode .starter-chip:hover {
     margin: 0 auto;
     width: 100%;
 }
+.giannis-chatbot-wrapper .input-area {
+    max-width: 900px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+}
 
 /* Input Wrapper */
 .giannis-chatbot-wrapper .input-wrapper {
@@ -1097,7 +1150,8 @@ body.dark-mode .starter-chip:hover {
 
 .giannis-chatbot-wrapper .sidebar.collapsed h1,
 .giannis-chatbot-wrapper .sidebar.collapsed .history-list,
-.giannis-chatbot-wrapper .sidebar.collapsed .theme-toggle {
+.giannis-chatbot-wrapper .sidebar.collapsed .theme-toggle,
+.giannis-chatbot-wrapper .sidebar.collapsed .clear-all-btn {
     display: none !important;
 }
 
@@ -1179,7 +1233,7 @@ body.dark-mode .starter-chip:hover {
     }
 }
 
-    .welcome-text {
+.welcome-text {
         font-size: var(--font-size-2xl);
     }
 }
@@ -1202,9 +1256,167 @@ body.dark-mode .starter-chip:hover {
 /* RTL adjustments for bot messages */
 .bot-message .rtl-message {
     /* Text flows correctly within the bubble */
+    direction: rtl;
 }
 
 /* RTL adjustments for user messages */
 .user-message .rtl-message {
     /* Right alignment is crucial for user messages in Arabic */
+    direction: rtl;
+}
+
+/* ================================================
+   OVERRIDE COMMON WORDPRESS THEME STYLES
+   ================================================ */
+
+/* Reset common button overrides */
+.giannis-chatbot-wrapper button,
+.giannis-chatbot-wrapper button:focus,
+.giannis-chatbot-wrapper button:active,
+.giannis-chatbot-wrapper button:hover {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+}
+
+/* Override Bricks Builder specific styles */
+#brx-content .giannis-chatbot-wrapper button,
+.brx-body .giannis-chatbot-wrapper button,
+.bricks-is-frontend .giannis-chatbot-wrapper button {
+    background-image: none !important;
+    text-indent: 0 !important;
+}
+
+/* Force proper flexbox behavior */
+#brx-content .giannis-chatbot-wrapper .app-container,
+.brx-body .giannis-chatbot-wrapper .app-container {
+    display: flex !important;
+    flex-direction: row !important;
+}
+
+/* Ensure inputs don't inherit weird padding */
+.giannis-chatbot-wrapper input,
+.giannis-chatbot-wrapper textarea,
+.giannis-chatbot-wrapper button {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
+
+/* Force SVG display */
+.giannis-chatbot-wrapper svg {
+    display: inline-block !important;
+    vertical-align: middle !important;
+    fill: currentColor;
+}
+
+/* Ensure links in the chatbot don't get theme styles */
+.giannis-chatbot-wrapper a,
+.giannis-chatbot-wrapper a:hover,
+.giannis-chatbot-wrapper a:focus,
+.giannis-chatbot-wrapper a:visited {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    background-image: none !important;
+}
+
+/* Prevent theme typography from affecting chatbot */
+.giannis-chatbot-wrapper h1,
+.giannis-chatbot-wrapper h2,
+.giannis-chatbot-wrapper h3,
+.giannis-chatbot-wrapper h4,
+.giannis-chatbot-wrapper h5,
+.giannis-chatbot-wrapper h6,
+.giannis-chatbot-wrapper p,
+.giannis-chatbot-wrapper span,
+.giannis-chatbot-wrapper div {
+    font-family: inherit !important;
+    line-height: inherit !important;
+}
+
+/* ================================================
+   EMOJI AND SPECIAL CHARACTER FIX
+   Prevents text from being hidden after emojis
+   ================================================ */
+
+/* Fix for message content with emojis */
+.giannis-chatbot-wrapper .message-content {
+    /* Ensure proper overflow handling */
+    overflow: visible !important;
+    word-wrap: break-word !important;
+    word-break: normal !important;
+    white-space: normal !important;
+    
+    /* Fix line-height issues with emojis */
+    line-height: 1.6 !important;
+}
+
+/* Specific fix for content wrapper containing emojis */
+.giannis-chatbot-wrapper .message-content > div {
+    overflow: visible !important;
+    word-wrap: break-word !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    position: relative !important;
+    white-space: pre-wrap !important; /* Preserve whitespace but allow wrapping */
+}
+
+/* Ensure emojis don't break layout */
+.giannis-chatbot-wrapper .message-content emoji,
+.giannis-chatbot-wrapper .message-content .emoji,
+.giannis-chatbot-wrapper .message-content span {
+    display: inline !important;
+    vertical-align: baseline !important;
+    line-height: inherit !important;
+    overflow: visible !important;
+}
+
+/* Fix for RTL messages with emojis */
+.giannis-chatbot-wrapper .rtl-message {
+    display: block !important;
+    width: 100% !important;
+    overflow: visible !important;
+    unicode-bidi: plaintext !important; /* Better handling of mixed LTR/RTL with emojis */
+}
+
+/* Ensure proper rendering of mixed content */
+.giannis-chatbot-wrapper .message-content br {
+    display: block !important;
+    content: "" !important;
+    margin-top: 0 !important;
+}
+
+/* Fix potential issues with strong/em tags after emojis */
+.giannis-chatbot-wrapper .message-content strong,
+.giannis-chatbot-wrapper .message-content em {
+    display: inline !important;
+    font-weight: inherit !important;
+    font-style: inherit !important;
+}
+
+.giannis-chatbot-wrapper .message-content strong {
+    font-weight: 600 !important;
+}
+
+.giannis-chatbot-wrapper .message-content em {
+    font-style: italic !important;
+}
+
+/* Ensure message content doesn't get clipped */
+.giannis-chatbot-wrapper .bot-message .message-content {
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding-bottom: 1.5rem !important; /* Extra padding to ensure nothing is cut off */
+}
+
+/* Fix for typewriter effect with emojis */
+.giannis-chatbot-wrapper .message-content [data-raw-markdown] {
+    display: block !important;
+    width: 100% !important;
+    overflow: visible !important;
+    white-space: pre-wrap !important;
+    word-break: normal !important;
+    line-height: 1.6 !important;
 }

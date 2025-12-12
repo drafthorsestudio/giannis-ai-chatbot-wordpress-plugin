@@ -1,11 +1,11 @@
 <?php
 /**
- * Giannis AI Chatbot Template
+ * Giannis AI Chatbot Template - t
  * 
  * This template renders the chatbot interface when the [giannis_chatbot] shortcode is used.
  * 
  * @package Giannis_AI_Chatbot
- * @since 1.0.7
+ * @since 1.0.8
  * */
 
 // Prevent direct access
@@ -75,7 +75,7 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
                 </button>
-
+                
                 <!-- Clear All Chats Button -->
                 <button class="clear-all-btn" id="chatbot-clear-all" title="<?php esc_attr_e('Cancella tutte le chat', 'giannis-ai-chatbot'); ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -121,7 +121,7 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
 
             <div class="input-area-container centered" id="inputAreaContainer">
                 <div class="input-area">
-                    <!-- Quick Starter Buttons (visible only when chat is empty) -->
+                   <!-- Quick Starter Buttons (visible only when chat is empty) -->
                     <div class="language-starters" id="languageStarters">
                         <button type="button" class="starter-chip" data-message="Hi">EN Hi 👋</button>
                         <button type="button" class="starter-chip" data-message="Ciao">IT Ciao 👋</button>
@@ -207,8 +207,4 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
     flex-direction: row !important;
 }
 
-#brx-content .giannis-chatbot-wrapper .sidebar {
-    width: 280px !important;
-    flex-shrink: 0 !important;
-}
 </style>
