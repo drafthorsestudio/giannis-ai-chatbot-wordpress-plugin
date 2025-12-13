@@ -1,6 +1,6 @@
 /**
  * Giannis AI Chatbot - WordPress Plugin Styles
- * Version: 1.0.9
+ * Version: 1.0.8
  * 
  * This stylesheet ensures the chatbot interface maintains its design
  * even when embedded in WordPress sites with aggressive theme styles
@@ -1209,6 +1209,12 @@ body.dark-mode .starter-chip:hover {
         align-items: center !important;
     }
 
+    /* Welcome Container */
+    .giannis-chatbot-wrapper .welcome-container {
+        top: 33% !important;
+    }
+
+
     .giannis-chatbot-wrapper .message {
         padding: 0 1rem !important;
         gap: 1rem !important;
@@ -1335,72 +1341,122 @@ body.dark-mode .starter-chip:hover {
 }
 
 /* ================================================
-   EMOJI TEXT VISIBILITY FIX
-   Prevents text from being hidden after emojis
+   TARGETED EMOJI TEXT VISIBILITY FIX
+   Prevents text from being hidden after emojis without affecting normal text spacing
    ================================================ */
 
-/* Primary fix: Ensure message content doesn't clip text after emojis */
+/* Primary fix: Ensure message content handles emojis properly */
 .giannis-chatbot-wrapper .message-content {
-    /* Critical: Use pre-wrap to preserve whitespace but allow wrapping */
-    white-space: pre-wrap !important;
+    /* Keep normal white-space handling for most text */
+    white-space: normal !important;
     
     /* Ensure overflow is visible */
     overflow: visible !important;
     overflow-wrap: break-word !important;
-    word-break: break-word !important;
+    word-wrap: break-word !important;
     
-    /* Maintain proper line height for emojis */
+    /* Slightly increased line height for better emoji rendering */
     line-height: 1.75 !important;
     
     /* Ensure adequate padding so nothing gets cut off */
     padding-right: 2rem !important;
-    padding-bottom: 1.5rem !important;
+    padding-bottom: 1.25rem !important;
+    
+    /* Force block display to prevent inline issues */
+    display: block !important;
 }
 
-/* Fix for the content wrapper div that contains the actual text */
+/* Fix for the content wrapper div - the key is display and overflow */
 .giannis-chatbot-wrapper .message-content > div:not(.message-sources) {
     display: block !important;
     width: 100% !important;
     overflow: visible !important;
-    white-space: pre-wrap !important;
-    word-break: break-word !important;
     position: relative !important;
     z-index: 1 !important;
+    
+    /* Use normal white-space but ensure word breaking works */
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    
+    /* Minimum height to ensure content is visible */
+    min-height: 1.5em !important;
 }
 
-/* Ensure emojis and surrounding text render properly */
-.giannis-chatbot-wrapper .message-content * {
-    /* Prevent any element from hiding overflow */
-    overflow: visible !important;
+/* Special handling for lines containing emojis using CSS content inspection */
+.giannis-chatbot-wrapper .message-content > div {
+    /* Reset any potential text-overflow or clip */
+    text-overflow: visible !important;
+    clip: auto !important;
+    -webkit-clip-path: none !important;
+    clip-path: none !important;
 }
 
-/* Specific fix for RTL messages that might contain emojis */
-.giannis-chatbot-wrapper .rtl-message {
-    display: block !important;
-    width: 100% !important;
-    overflow: visible !important;
-    white-space: pre-wrap !important;
-    /* Use plaintext for better mixed LTR/RTL handling */
-    unicode-bidi: plaintext !important;
-}
-
-/* Ensure the copy button doesn't interfere with text layout */
-.giannis-chatbot-wrapper .copy-btn {
-    position: absolute !important;
-    z-index: 10 !important;
-    /* Move it slightly further right to avoid overlap */
-    right: 0.5rem !important;
-    top: 0.5rem !important;
-}
-
-/* Additional safeguard for bot messages */
+/* Fix specific to bot messages with potential emoji content */
 .giannis-chatbot-wrapper .bot-message .message-content {
+    /* Ensure the container expands to show all content */
     min-width: 200px !important;
     max-width: 85% !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    
+    /* Clear any float issues that might hide text */
+    clear: both !important;
+}
+
+/* Ensure inline elements after emojis remain visible */
+.giannis-chatbot-wrapper .message-content span,
+.giannis-chatbot-wrapper .message-content strong,
+.giannis-chatbot-wrapper .message-content em {
+    /* Ensure inline elements don't get hidden */
+    display: inline !important;
+    visibility: visible !important;
+    position: static !important;
     overflow: visible !important;
 }
 
 /* Fix potential font rendering issues with emojis */
 .giannis-chatbot-wrapper .message-content {
+    /* Include emoji-capable fonts in the stack */
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif !important;
+    
+    /* Prevent font-variant issues that might affect emoji rendering */
+    font-variant: normal !important;
+    font-variant-ligatures: normal !important;
+    font-variant-caps: normal !important;
+}
+
+/* Alternative approach: Force repaint after emoji */
+.giannis-chatbot-wrapper .message-content::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* Ensure RTL messages with emojis still work */
+.giannis-chatbot-wrapper .rtl-message {
+    display: block !important;
+    width: 100% !important;
+    overflow: visible !important;
+    unicode-bidi: embed !important;
+    direction: rtl !important;
+}
+
+/* Additional fix: Ensure the message bubble expands properly */
+.giannis-chatbot-wrapper .message-content {
+    /* Use flex to ensure content doesn't get compressed */
+    display: flex !important;
+    flex-direction: column !important;
+    flex-shrink: 0 !important;
+}
+
+.giannis-chatbot-wrapper .message-content > div:not(.message-sources) {
+    flex: 1 1 auto !important;
+}
+
+/* Last resort: Force minimum dimensions for content visibility */
+.giannis-chatbot-wrapper .bot-message .message-content > div[data-raw-markdown] {
+    min-height: 2em !important;
+    padding-bottom: 0.5em !important;
 }
