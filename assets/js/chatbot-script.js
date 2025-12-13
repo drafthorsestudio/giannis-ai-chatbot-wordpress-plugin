@@ -1,6 +1,6 @@
 /**
  * Giannis AI Chatbot - WordPress Plugin JavaScript
- * Version: 1.07
+ * Version: 1.09
  */
 
 // Configuration - will be loaded from server
@@ -76,9 +76,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     const historyList = document.getElementById('historyList');
     const themeToggle = document.getElementById('themeToggle');
     const themeIcon = document.getElementById('themeIcon');
+    
+    // Quick Starter Language Buttons - MUST be declared before updateStartersVisibility is called
+    const languageStarters = document.getElementById('languageStarters');
+    const starterChips = document.querySelectorAll('.starter-chip');
 
     let isFirstMessage = true;
     let dynamicTextInterval = null;
+
+    // Function to update starters visibility - defined before startNewChat which calls it
+    function updateStartersVisibility() {
+        if (!languageStarters) return;
+
+        // Show starters only if chat is empty (no messages and it's a new chat)
+        if (isFirstMessage && chatMessages.children.length === 0) {
+            languageStarters.classList.remove('hidden-starters');
+        } else {
+            languageStarters.classList.add('hidden-starters');
+        }
+    }
 
     // Initialize UI
     initializeTheme();
@@ -120,22 +136,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.log('✅ Tutte le chat sono state cancellate');
             }
         });
-    }
-
-    // Quick Starter Language Buttons
-    const languageStarters = document.getElementById('languageStarters');
-    const starterChips = document.querySelectorAll('.starter-chip');
-
-    // Function to update starters visibility
-    function updateStartersVisibility() {
-        if (!languageStarters) return;
-
-        // Show starters only if chat is empty (no messages and it's a new chat)
-        if (isFirstMessage && chatMessages.children.length === 0) {
-            languageStarters.classList.remove('hidden-starters');
-        } else {
-            languageStarters.classList.add('hidden-starters');
-        }
     }
 
     // Initialize starters visibility
