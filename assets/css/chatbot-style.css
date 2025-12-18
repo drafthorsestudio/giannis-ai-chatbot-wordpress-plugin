@@ -1,9 +1,11 @@
 /**
  * Giannis AI Chatbot - WordPress Plugin Styles
- * Version: 1.0.8
+ * Version: 1.1.0 - WITH TYPING INDICATOR FIX
  * 
  * This stylesheet ensures the chatbot interface maintains its design
  * even when embedded in WordPress sites with aggressive theme styles
+ * 
+ * INCLUDES: Emoji text visibility fix + Horizontal typing dots fix
  */
 
 /* ================================================
@@ -64,17 +66,6 @@
 
     /* Typography Scale */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    /*
-    --font-size-xs: 0.75rem;
-    --font-size-sm: 0.875rem;
-    --font-size-base: 1rem;
-    --font-size-lg: 1.125rem;
-    --font-size-xl: 1.25rem;
-    --font-size-2xl: 1.5rem;
-    --font-size-3xl: 2rem;
-    --font-size-4xl: 2.5rem;
-
-    */
     --font-size-xs: clamp(1rem,.0875vw + 1rem,1.1rem);
     --font-size-sm: clamp(1.25rem,1.1vw + 1rem,1.33rem);
     --font-size-base: clamp(1.5rem,1.33vw + 1rem,1.75rem);
@@ -82,7 +73,7 @@
     --font-size-xl: clamp(1.8rem,2.25vw + 1rem,3rem);
     --font-size-2xl: clamp(2rem,2.5vw + 1rem,4rem);
     --font-size-3xl: clamp(3rem,3.25vw + 1rem,4rem);
-    --font-size-4xl: clamp(4.5rem,3.75vw + 1rem,4rem);
+    --font-size-4xl: clamp(4rem,3.75vw + 1rem,4rem);
 
     /* Line Heights */
     --line-height-tight: 1.25;
@@ -690,7 +681,7 @@
     letter-spacing: var(--tracking-tight) !important;
     margin: 0 !important;
     padding: 0 !important;
-    line-height: 1.2 !important;
+    line-height: 1.1 !important;
     text-transform: none !important;
     flex-direction: row;
 }
@@ -1019,9 +1010,6 @@ body.dark-mode .starter-chip:hover {
     background: transparent !important;
     border: none !important;
     resize: none !important;
-    /*font-family: var(--font-family) !important;
-    font-size: var(--font-size-base) !important;
-    line-height: var(--line-height-normal) !important;*/
     max-height: 200px !important;
     padding: 8px 0 !important;
     outline: none !important;
@@ -1100,20 +1088,44 @@ body.dark-mode .starter-chip:hover {
 }
 
 /* ================================================
-   TYPING INDICATOR
+   TYPING INDICATOR - FIXED FOR HORIZONTAL DISPLAY
    ================================================ */
 .giannis-chatbot-wrapper .typing-indicator {
     display: flex !important;
+    flex-direction: row !important; /* Force horizontal layout */
+    align-items: center !important;
+    justify-content: flex-start !important;
     gap: 6px !important;
     padding: 8px 4px !important;
+    min-height: 24px !important;
+    width: auto !important;
+    white-space: nowrap !important; /* Prevent wrapping */
+    overflow: visible !important;
+    flex-wrap: nowrap !important; /* Prevent flex wrapping */
 }
 
 .giannis-chatbot-wrapper .typing-dot {
+    display: inline-block !important; /* Ensure inline display */
     width: 8px !important;
     height: 8px !important;
+    min-width: 8px !important;
+    min-height: 8px !important;
     background-color: var(--accent-color) !important;
     border-radius: 50% !important;
     animation: typingBounce 1.4s infinite ease-in-out both;
+    margin: 0 !important; /* Reset margins */
+    padding: 0 !important; /* Reset padding */
+    vertical-align: middle !important;
+    float: none !important; /* Prevent floating */
+    position: relative !important; /* Prevent absolute positioning */
+    flex-shrink: 0 !important; /* Prevent dots from shrinking */
+}
+
+/* Ensure proper message content display for typing indicator */
+.giannis-chatbot-wrapper .bot-message .message-content:has(.typing-indicator) {
+    display: flex !important;
+    align-items: center !important;
+    min-width: 60px !important; /* Minimum width for 3 dots */
 }
 
 .giannis-chatbot-wrapper .typing-dot:nth-child(1) {
@@ -1122,6 +1134,10 @@ body.dark-mode .starter-chip:hover {
 
 .giannis-chatbot-wrapper .typing-dot:nth-child(2) {
     animation-delay: -0.16s;
+}
+
+.giannis-chatbot-wrapper .typing-dot:nth-child(3) {
+    animation-delay: 0s;
 }
 
 @keyframes typingBounce {
@@ -1133,6 +1149,24 @@ body.dark-mode .starter-chip:hover {
         transform: scale(1);
         opacity: 1;
     }
+}
+
+/* WordPress theme overrides for typing indicator */
+#brx-content .giannis-chatbot-wrapper .typing-indicator,
+.brx-body .giannis-chatbot-wrapper .typing-indicator,
+.bricks-is-frontend .giannis-chatbot-wrapper .typing-indicator,
+body .giannis-chatbot-wrapper .typing-indicator {
+    display: flex !important;
+    flex-direction: row !important;
+}
+
+#brx-content .giannis-chatbot-wrapper .typing-dot,
+.brx-body .giannis-chatbot-wrapper .typing-dot,
+.bricks-is-frontend .giannis-chatbot-wrapper .typing-dot,
+body .giannis-chatbot-wrapper .typing-dot {
+    display: inline-block !important;
+    float: none !important;
+    clear: none !important;
 }
 
 /* ================================================
@@ -1186,6 +1220,11 @@ body.dark-mode .starter-chip:hover {
         font-size: var(--font-size-2xl) !important;
         flex-direction: column !important;
     }
+	/* Welcome Container */
+    .giannis-chatbot-wrapper .welcome-container {
+        top: 33% !important;
+    }
+
 }
 
 @media (max-width: 768px) {
@@ -1209,12 +1248,6 @@ body.dark-mode .starter-chip:hover {
         align-items: center !important;
     }
 
-    /* Welcome Container */
-    .giannis-chatbot-wrapper .welcome-container {
-        top: 33% !important;
-    }
-
-
     .giannis-chatbot-wrapper .message {
         padding: 0 1rem !important;
         gap: 1rem !important;
@@ -1237,9 +1270,8 @@ body.dark-mode .starter-chip:hover {
     .giannis-chatbot-wrapper .welcome-logo img {
         height: 70px !important;
     }
-}
 
-.welcome-text {
+    .welcome-text {
         font-size: var(--font-size-2xl);
     }
 }
@@ -1341,8 +1373,8 @@ body.dark-mode .starter-chip:hover {
 }
 
 /* ================================================
-   TARGETED EMOJI TEXT VISIBILITY FIX
-   Prevents text from being hidden after emojis without affecting normal text spacing
+   EMOJI TEXT VISIBILITY FIX
+   Prevents text from being hidden after emojis
    ================================================ */
 
 /* Primary fix: Ensure message content handles emojis properly */
@@ -1459,4 +1491,11 @@ body.dark-mode .starter-chip:hover {
 .giannis-chatbot-wrapper .bot-message .message-content > div[data-raw-markdown] {
     min-height: 2em !important;
     padding-bottom: 0.5em !important;
+}
+
+/* Special class for emoji-fixed content */
+.giannis-chatbot-wrapper .emoji-content-fixed {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }

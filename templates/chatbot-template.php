@@ -5,7 +5,7 @@
  * This template renders the chatbot interface when the [giannis_chatbot] shortcode is used.
  * 
  * @package Giannis_AI_Chatbot
- * @since 1.0.8
+ * @since 1.1.0
  * */
 
 // Prevent direct access
@@ -41,7 +41,7 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
                     <?php esc_html_e('New Chat', 'giannis-ai-chatbot'); ?>
                 </button>
 
-                <a href="https://form.typeform.com/to/rpVbmnoi" target="_blank" rel="noopener noreferrer" class="feedback-btn" id="feedbackBtn"
+                <a href="https://form.typeform.com/to/qbr4zxO0" target="_blank" rel="noopener noreferrer" class="feedback-btn" id="feedbackBtn"
                     title="<?php esc_attr_e('Share your feedback', 'giannis-ai-chatbot'); ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -142,7 +142,7 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
                             </button>
                         </div>
                     </form>
-                    <div class="disclaimer"><?php esc_html_e('Giannis can make mistakes as it is still in a pilot phase. Check important info.', 'giannis-ai-chatbot'); ?></div>
+                    <div class="disclaimer"><?php esc_html_e('Giannis can make mistakes as it is still in a pilot phase. It is not for emergencies. Please click here for important information.', 'giannis-ai-chatbot'); ?></div>
                 </div>
             </div>
         </main>

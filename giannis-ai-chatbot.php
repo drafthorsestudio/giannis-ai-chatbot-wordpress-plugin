@@ -3,7 +3,7 @@
  * Plugin Name: Giannis AI Chatbot
  * Plugin URI: https://antitraffickingresponse.org
  * Description: A modern AI chatbot interface powered by Signpost AI
- * Version: 1.0.9
+ * Version: 1.1.0
  * Author: IRC AT
  * Author URI: https://antitraffickingresponse.org
  * License: GPL v2 or later
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('GIANNIS_CHATBOT_VERSION', '1.0.6');
+define('GIANNIS_CHATBOT_VERSION', '1.1.0');
 define('GIANNIS_CHATBOT_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('GIANNIS_CHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -79,7 +79,8 @@ class Giannis_AI_Chatbot {
                 'giannis-chatbot-script',
                 GIANNIS_CHATBOT_PLUGIN_URL . 'assets/js/chatbot-script.js',
                 array('jquery'),
-                GIANNIS_CHATBOT_VERSION . '.1', // Bump version
+				'1.1.0', // Updated version
+                //GIANNIS_CHATBOT_VERSION . '.1', // Bump version
                 true
             );
             
