@@ -1,6 +1,8 @@
 /**
  * Giannis AI Chatbot - WordPress Plugin JavaScript
- * Version: 1.09
+ * Version: 1.1.0 - WITH EMOJI FIX
+ * 
+ * This version includes comprehensive fixes for emoji text visibility issues
  */
 
 // Configuration - will be loaded from server
@@ -50,6 +52,50 @@ async function loadConfig() {
 let chats = JSON.parse(localStorage.getItem('giannis_chats')) || [];
 let currentChatId = null;
 let messageAnimationIndex = 0;
+
+// Simplified emoji fix function that doesn't break HTML
+function fixEmojiRendering(element, originalText) {
+    // List of problematic emojis that cause rendering issues
+    const problematicEmojis = ['⚠️', '⚠', '⚡', '🚨', '❗', '❌', '✅', '⭐', '🔴', '🟡', '🟢'];
+    
+    // Check if content has problematic emojis
+    const hasProblematicEmoji = problematicEmojis.some(emoji => element.textContent.includes(emoji));
+    
+    if (hasProblematicEmoji) {
+        // Method 1: Force a repaint
+        element.style.display = 'none';
+        element.offsetHeight; // Trigger reflow
+        element.style.display = '';
+        
+        // Method 2: Add a class for CSS targeting
+        element.classList.add('emoji-content-fixed');
+        
+        // Method 3: Add zero-width space after emojis in text nodes only
+        const walker = document.createTreeWalker(
+            element,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+        );
+        
+        const textNodes = [];
+        let node;
+        while (node = walker.nextNode()) {
+            textNodes.push(node);
+        }
+        
+        textNodes.forEach(textNode => {
+            let text = textNode.nodeValue;
+            // Add zero-width space after emojis to prevent text hiding
+            problematicEmojis.forEach(emoji => {
+                text = text.replace(new RegExp(`(${emoji})(?!\\u200B)`, 'g'), '$1\u200B');
+            });
+            if (text !== textNode.nodeValue) {
+                textNode.nodeValue = text;
+            }
+        });
+    }
+}
 
 // Wait for both DOM and config to be ready before initializing
 document.addEventListener('DOMContentLoaded', async () => {
@@ -470,12 +516,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // EMOJI FIX: Modified typewriter effect function
     function typewriterEffect(element, htmlContent, speed = 5) {
-        // Create a temporary container to parse HTML
+        // Check if content has problematic emojis
+        const hasProblematicEmoji = /[⚠⚡❗❌✅⭐🔴🟡🟢☢☣]/.test(htmlContent);
+        
+        if (hasProblematicEmoji) {
+            // For messages with problematic emojis, use a different approach
+            // Insert the content all at once but with a fade-in effect
+            element.innerHTML = htmlContent;
+            
+            // Apply emoji fix immediately
+            fixEmojiRendering(element, htmlContent);
+            
+            // Animate with fade instead of typewriter
+            element.style.opacity = '0';
+            element.style.transition = 'opacity 0.5s ease-in';
+            setTimeout(() => {
+                element.style.opacity = '1';
+                scrollToBottom();
+            }, 10);
+            
+            return Promise.resolve();
+        }
+        
+        // Original typewriter code for non-emoji messages
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = htmlContent;
-
-        // Clear the element
         element.innerHTML = '';
 
         let currentIndex = 0;
@@ -484,7 +551,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         function typeNode(node) {
             return new Promise((resolve) => {
                 if (node.nodeType === Node.TEXT_NODE) {
-                    // Text node - type character by character
                     const text = node.textContent;
                     let charIndex = 0;
                     const textNode = document.createTextNode('');
@@ -494,7 +560,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         if (charIndex < text.length) {
                             textNode.textContent += text[charIndex];
                             charIndex++;
-                            scrollToBottom(); // Scroll as we type
+                            scrollToBottom();
                             setTimeout(typeChar, speed);
                         } else {
                             resolve();
@@ -502,7 +568,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                     typeChar();
                 } else if (node.nodeType === Node.ELEMENT_NODE) {
-                    // Element node - clone and append, then type children
                     const clonedElement = node.cloneNode(false);
                     element.appendChild(clonedElement);
 
@@ -569,7 +634,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // CRITICAL FIX: Return the Promise!
         return new Promise((resolve) => {
             function typeNextNode() {
                 if (currentIndex < nodes.length) {
@@ -578,7 +642,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         typeNextNode();
                     });
                 } else {
-                    resolve(); // Resolve when all nodes are typed
+                    resolve();
                 }
             }
             typeNextNode();
@@ -603,8 +667,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </svg>
             </button>
         ` : '';
-
-
 
         messageDiv.innerHTML = `
             <div class="message-avatar">${avatar}</div>
@@ -636,23 +698,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             copyBtn.style.display = 'none';
         }
 
+        // Create a wrapper for content (excluding copy button)
+        const contentWrapper = document.createElement('div');
+        
+        // Store raw markdown for copy functionality
+        contentWrapper.setAttribute('data-raw-markdown', text);
+        
+        // Apply RTL class if Arabic text is detected
+        if (isRTL(text)) {
+            contentWrapper.classList.add('rtl-message');
+        }
+        
+        // EMOJI FIX: Check if content has emojis before rendering
+        const hasEmoji = text && (text.includes('⚠') || text.includes('⚡') || text.includes('❗'));
+        
+        messageContent.insertBefore(contentWrapper, copyBtn);
+
         // Use typewriter effect for NEW bot messages, instant for user messages or loaded messages
         if (role === 'bot' && !skipTypewriter) {
-            // Create a wrapper for content (excluding copy button)
-            const contentWrapper = document.createElement('div');
-
-            // CRITICAL: Store raw markdown for copy functionality
-            contentWrapper.setAttribute('data-raw-markdown', text);
-
-            // Apply RTL class if Arabic text is detected
-            if (isRTL(text)) {
-                contentWrapper.classList.add('rtl-message');
-            }
-
-            messageContent.insertBefore(contentWrapper, copyBtn);
-
-            // Start typewriter effect
+            // Start typewriter effect (which now handles emojis internally)
             typewriterEffect(contentWrapper, formattedContent, 5).then(() => {
+                // Apply emoji fix after typewriter completes (belt and suspenders approach)
+                if (hasEmoji) {
+                    fixEmojiRendering(contentWrapper, text);
+                }
                 // Show copy button after typing is complete
                 if (copyBtn) {
                     copyBtn.style.display = 'flex';
@@ -660,18 +729,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         } else {
             // For user messages OR loaded messages, show immediately
-            const contentWrapper = document.createElement('div');
-
-            // CRITICAL: Store raw markdown for copy functionality
-            contentWrapper.setAttribute('data-raw-markdown', text);
-
-            // Apply RTL class if Arabic text is detected
-            if (isRTL(text)) {
-                contentWrapper.classList.add('rtl-message');
-            }
-
             contentWrapper.innerHTML = formattedContent;
-            messageContent.insertBefore(contentWrapper, copyBtn);
+            
+            // Apply emoji fix for instant messages too
+            if (hasEmoji) {
+                setTimeout(() => fixEmojiRendering(contentWrapper, text), 10);
+            }
         }
     }
 
@@ -825,18 +888,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         return html;
     }
 
+    // Fixed formatMarkdown function - no HTML manipulation of emojis
     function formatMarkdown(text) {
-        let html = text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-
+        if (!text) return "";
+        
+        // Create a temporary element to safely handle the text
+        const temp = document.createElement('div');
+        temp.textContent = text; // This safely escapes HTML
+        let html = temp.innerHTML;
+        
+        // Now apply markdown formatting
         html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
         html = html.replace(/\n/g, '<br>');
-
+        
+        // Don't manipulate emojis here - let them render naturally
+        // The emoji fix happens in the fixEmojiRendering function after DOM insertion
+        
         return html;
     }
 
