@@ -1,3 +1,5 @@
+let hasChatStarted = false;
+
 /**
  * Giannis AI Chatbot - WordPress Plugin JavaScript
  * Version: 1.1.0 - WITH EMOJI FIX
@@ -6,6 +8,7 @@
  */
 
 // Configuration - will be loaded from server
+
 let SIGNPOST_API_URL;
 let TEAM_ID;
 let AGENT_ID;
@@ -57,19 +60,19 @@ let messageAnimationIndex = 0;
 function fixEmojiRendering(element, originalText) {
     // List of problematic emojis that cause rendering issues
     const problematicEmojis = ['⚠️', '⚠', '⚡', '🚨', '❗', '❌', '✅', '⭐', '🔴', '🟡', '🟢'];
-    
+
     // Check if content has problematic emojis
     const hasProblematicEmoji = problematicEmojis.some(emoji => element.textContent.includes(emoji));
-    
+
     if (hasProblematicEmoji) {
         // Method 1: Force a repaint
         element.style.display = 'none';
         element.offsetHeight; // Trigger reflow
         element.style.display = '';
-        
+
         // Method 2: Add a class for CSS targeting
         element.classList.add('emoji-content-fixed');
-        
+
         // Method 3: Add zero-width space after emojis in text nodes only
         const walker = document.createTreeWalker(
             element,
@@ -77,13 +80,13 @@ function fixEmojiRendering(element, originalText) {
             null,
             false
         );
-        
+
         const textNodes = [];
         let node;
         while (node = walker.nextNode()) {
             textNodes.push(node);
         }
-        
+
         textNodes.forEach(textNode => {
             let text = textNode.nodeValue;
             // Add zero-width space after emojis to prevent text hiding
@@ -122,7 +125,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const historyList = document.getElementById('historyList');
     const themeToggle = document.getElementById('themeToggle');
     const themeIcon = document.getElementById('themeIcon');
-    
+
     // Quick Starter Language Buttons - MUST be declared before updateStartersVisibility is called
     const languageStarters = document.getElementById('languageStarters');
     const starterChips = document.querySelectorAll('.starter-chip');
@@ -288,6 +291,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         userInput.value = '';
         userInput.style.height = 'auto';
         sendBtn.setAttribute('disabled', 'true');
+
+        /* --- GA4 TRACKING START --- */
+        if (typeof gtag === 'function') {
+            // Track every message sent
+            gtag('event', 'giannis_message_sent', {
+                'event_category': 'Chatbot',
+                'event_label': 'User Query'
+            });
+
+            // Track chat start (only once per session)
+            if (!hasChatStarted) {
+                gtag('event', 'giannis_chat_start', {
+                    'event_category': 'Chatbot',
+                    'event_label': 'First Interaction'
+                });
+                hasChatStarted = true;
+            }
+        }
+        /* --- GA4 TRACKING END --- */
 
         // Call API
         await callSignpostAI(message);
@@ -520,15 +542,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     function typewriterEffect(element, htmlContent, speed = 5) {
         // Check if content has problematic emojis
         const hasProblematicEmoji = /[⚠⚡❗❌✅⭐🔴🟡🟢☢☣]/.test(htmlContent);
-        
+
         if (hasProblematicEmoji) {
             // For messages with problematic emojis, use a different approach
             // Insert the content all at once but with a fade-in effect
             element.innerHTML = htmlContent;
-            
+
             // Apply emoji fix immediately
             fixEmojiRendering(element, htmlContent);
-            
+
             // Animate with fade instead of typewriter
             element.style.opacity = '0';
             element.style.transition = 'opacity 0.5s ease-in';
@@ -536,10 +558,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 element.style.opacity = '1';
                 scrollToBottom();
             }, 10);
-            
+
             return Promise.resolve();
         }
-        
+
         // Original typewriter code for non-emoji messages
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = htmlContent;
@@ -700,18 +722,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Create a wrapper for content (excluding copy button)
         const contentWrapper = document.createElement('div');
-        
+
         // Store raw markdown for copy functionality
         contentWrapper.setAttribute('data-raw-markdown', text);
-        
+
         // Apply RTL class if Arabic text is detected
         if (isRTL(text)) {
             contentWrapper.classList.add('rtl-message');
         }
-        
+
         // EMOJI FIX: Check if content has emojis before rendering
         const hasEmoji = text && (text.includes('⚠') || text.includes('⚡') || text.includes('❗'));
-        
+
         messageContent.insertBefore(contentWrapper, copyBtn);
 
         // Use typewriter effect for NEW bot messages, instant for user messages or loaded messages
@@ -730,7 +752,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             // For user messages OR loaded messages, show immediately
             contentWrapper.innerHTML = formattedContent;
-            
+
             // Apply emoji fix for instant messages too
             if (hasEmoji) {
                 setTimeout(() => fixEmojiRendering(contentWrapper, text), 10);
@@ -827,11 +849,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     function scrollToBottom() {
         // Scroll the chat messages container itself
         chatMessages.scrollTop = chatMessages.scrollHeight;
-        
+
         // For the window scroll, add offset for header
         const headerOffset = getHeaderOffset();
         const chatBottom = chatMessages.getBoundingClientRect().bottom;
-        
+
         // Only scroll the window if needed (when chat extends beyond viewport)
         if (chatBottom > window.innerHeight) {
             const scrollTarget = window.pageYOffset + (chatBottom - window.innerHeight) + 20; // 20px buffer
@@ -845,7 +867,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Helper function to determine header offset based on screen size
     function getHeaderOffset() {
         const width = window.innerWidth;
-        
+
         if (width <= 768) {
             // Mobile: typically larger headers
             return 120; // Adjust this value based on your mobile header height
@@ -891,20 +913,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Fixed formatMarkdown function - no HTML manipulation of emojis
     function formatMarkdown(text) {
         if (!text) return "";
-        
+
         // Create a temporary element to safely handle the text
         const temp = document.createElement('div');
         temp.textContent = text; // This safely escapes HTML
         let html = temp.innerHTML;
-        
+
         // Now apply markdown formatting
         html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
         html = html.replace(/\n/g, '<br>');
-        
+
         // Don't manipulate emojis here - let them render naturally
         // The emoji fix happens in the fixEmojiRendering function after DOM insertion
-        
+
         return html;
     }
 
@@ -925,7 +947,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function toggleTheme() {
         const wrapper = document.querySelector('.giannis-chatbot-wrapper');
         if (!wrapper) return;
-        
+
         const isDark = wrapper.classList.toggle('dark-mode');
         localStorage.setItem('giannis_theme', isDark ? 'dark' : 'light');
         updateThemeIcon(isDark);
@@ -952,7 +974,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (chatInterface) {
                 chatInterface.style.backgroundColor = '#0a0b0b';
             }
-            
+
         } else {
             // Sun icon
             if (themeIcon) {
@@ -1056,3 +1078,33 @@ window.copyToClipboard = function (button) {
         document.body.removeChild(textArea);
     });
 };
+
+/* --- GA4 BUTTON TRACKING --- */
+document.addEventListener('DOMContentLoaded', function () {
+    // 1. Feedback Button
+    const feedbackBtn = document.getElementById('feedbackBtn');
+    if (feedbackBtn) {
+        feedbackBtn.addEventListener('click', function () {
+            if (typeof gtag === 'function') {
+                gtag('event', 'giannis_feedback_click', {
+                    'event_category': 'Chatbot',
+                    'event_label': 'Sidebar Button'
+                });
+            }
+        });
+    }
+
+    // 2. Quick Starters (Chips)
+    const starters = document.querySelectorAll('.starter-chip');
+    starters.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+            const messageType = chip.getAttribute('data-message');
+            if (typeof gtag === 'function') {
+                gtag('event', 'giannis_starter_click', {
+                    'event_category': 'Chatbot',
+                    'event_label': messageType
+                });
+            }
+        });
+    });
+});
