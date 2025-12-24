@@ -18,8 +18,35 @@ class Giannis_Chatbot_API {
         add_action('wp_ajax_nopriv_giannis_send_message', array($this, 'send_message'));
     }
     
+    /**
+     * Verify nonce with cache-friendly fallback for non-logged-in users.
+     * Pantheon and other aggressive caching systems may serve stale nonces.
+     * For public chatbot features, we allow requests without valid nonce for guests.
+     */
+    private function verify_nonce_with_cache_fallback() {
+        $nonce = isset($_POST['nonce']) ? sanitize_text_field($_POST['nonce']) : '';
+        
+        // If user is logged in, always require valid nonce
+        if (is_user_logged_in()) {
+            if (!wp_verify_nonce($nonce, 'giannis_chatbot_nonce')) {
+                wp_send_json_error(array('message' => 'Security check failed'), 403);
+                exit;
+            }
+            return true;
+        }
+        
+        // For non-logged-in users, verify nonce but don't block on failure
+        // This handles cached pages with stale nonces (common on Pantheon)
+        if ($nonce && !wp_verify_nonce($nonce, 'giannis_chatbot_nonce')) {
+            // Log for debugging but allow the request
+            error_log('Giannis Chatbot: Stale nonce detected (likely cached page). Allowing guest request.');
+        }
+        
+        return true;
+    }
+    
     public function get_config() {
-        check_ajax_referer('giannis_chatbot_nonce', 'nonce');
+        $this->verify_nonce_with_cache_fallback();
         
         $settings = get_option('giannis_chatbot_settings');
         
@@ -31,7 +58,7 @@ class Giannis_Chatbot_API {
     }
     
     public function send_message() {
-        check_ajax_referer('giannis_chatbot_nonce', 'nonce');
+        $this->verify_nonce_with_cache_fallback();
         
         $settings = get_option('giannis_chatbot_settings');
         $message = sanitize_text_field($_POST['message']);
