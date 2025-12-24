@@ -24,15 +24,9 @@ class Giannis_Chatbot_API {
         add_action('wp_ajax_nopriv_giannis_send_message', array($this, 'send_message'));
     }
     
-    /**
-     * Verify nonce with cache-friendly fallback for non-logged-in users.
-     * Pantheon and other aggressive caching systems may serve stale nonces.
-     * For public chatbot features, we allow requests without valid nonce for guests.
-     */
     private function verify_nonce_with_cache_fallback() {
         $nonce = isset($_POST['nonce']) ? sanitize_text_field($_POST['nonce']) : '';
         
-        // If user is logged in, always require valid nonce (Strict Security)
         if (is_user_logged_in()) {
             if (!wp_verify_nonce($nonce, 'giannis_chatbot_nonce')) {
                 wp_send_json_error(array('message' => 'Security check failed'), 403);
@@ -41,10 +35,8 @@ class Giannis_Chatbot_API {
             return true;
         }
         
-        // For non-logged-in users (Guests), allow stale nonces due to caching
-        // We log it for debugging but don't block the chat
         if ($nonce && !wp_verify_nonce($nonce, 'giannis_chatbot_nonce')) {
-            error_log('Giannis Chatbot: Stale nonce detected (likely cached page). Allowing guest request.');
+            error_log('Giannis Chatbot: Stale nonce detected. Allowing guest request.');
         }
         
         return true;
@@ -55,7 +47,6 @@ class Giannis_Chatbot_API {
         
         $settings = get_option('giannis_chatbot_settings');
         
-        // Safety check if settings are empty
         if (!$settings) {
             wp_send_json_error(array('message' => 'Plugin not configured'), 500);
             return;
@@ -72,8 +63,6 @@ class Giannis_Chatbot_API {
         $this->verify_nonce_with_cache_fallback();
         
         $settings = get_option('giannis_chatbot_settings');
-        
-        // Input sanitization with safety checks
         $message = isset($_POST['message']) ? sanitize_text_field($_POST['message']) : '';
         $session_id = isset($_POST['session_id']) ? sanitize_text_field($_POST['session_id']) : '';
         
