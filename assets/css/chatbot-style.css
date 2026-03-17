@@ -880,11 +880,28 @@
 .giannis-chatbot-wrapper .message-sources strong {
     font-weight: 600 !important;
     color: var(--text-primary) !important;
-    display: block !important;
-    margin-bottom: 6px !important;
+    display: inline !important;
+    margin-right: 6px !important;
     text-transform: uppercase !important;
     font-size: var(--font-size-xs) !important;
     letter-spacing: var(--tracking-wide) !important;
+}
+
+.giannis-chatbot-wrapper .source-item {
+    display: inline-block !important;
+    background: rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid var(--border-light) !important;
+    border-radius: var(--radius-xs) !important;
+    padding: 2px 8px !important;
+    margin: 3px 4px 3px 0 !important;
+    font-size: var(--font-size-xs) !important;
+    color: var(--text-secondary) !important;
+    white-space: nowrap !important;
+}
+
+.giannis-chatbot-wrapper.dark-mode .source-item {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 /* ================================================

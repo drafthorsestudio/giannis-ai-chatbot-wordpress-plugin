@@ -2,9 +2,12 @@ let hasChatStarted = false;
 
 /**
  * Giannis AI Chatbot - WordPress Plugin JavaScript
- * Version: 1.1.0 - WITH EMOJI FIX
+ * Version: 1.2.0 - CACHE-PROOF NONCE REFRESH
  * 
- * This version includes comprehensive fixes for emoji text visibility issues
+ * This version includes:
+ * - Dynamic nonce refresh to survive Pantheon page caching
+ * - All API calls routed through admin-ajax.php
+ * - Comprehensive emoji text visibility fixes
  */
 
 // Configuration - will be loaded from server
@@ -21,9 +24,43 @@ function isRTL(text) {
     return rtlPattern.test(text);
 }
 
+/**
+ * DYNAMIC NONCE REFRESH
+ * Fetches a fresh nonce from a public (nopriv) endpoint.
+ * This bypasses Pantheon's page cache, which may serve a stale nonce
+ * embedded in the HTML for up to 1 week.
+ */
+async function refreshNonce() {
+    try {
+        const response = await fetch(giannisConfig.apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'giannis_refresh_nonce'
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success && result.data.nonce) {
+            giannisConfig.nonce = result.data.nonce;
+            console.log('🔑 Nonce refreshed successfully');
+        } else {
+            console.warn('⚠️ Nonce refresh response was not successful');
+        }
+    } catch (error) {
+        console.error('❌ Failed to refresh nonce:', error);
+    }
+}
+
 // Load configuration from WordPress
 async function loadConfig() {
     try {
+        // Always refresh the nonce first (the cached one may be expired)
+        await refreshNonce();
+
         const response = await fetch(giannisConfig.apiUrl, {
             method: 'POST',
             headers: {
@@ -764,45 +801,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         const typingId = showTypingIndicator();
 
         try {
+            // Refresh nonce before every message send to guarantee validity
+            await refreshNonce();
+
             // Generate a session ID based on chat ID or random if needed
             const apiSessionId = currentChatId ? `chat-${currentChatId}` : `user-${Date.now()}`;
 
-            const payload = {
-                id: AGENT_ID,
-                team_id: TEAM_ID,
-                message: userMessage,
-                uid: apiSessionId,
-                to_number: null,
-                audio: null
-            };
+            console.log('📤 Sending message via admin-ajax (giannis_send_message)');
 
-            console.log('📤 Sending request to API:', payload);
-
-            const response = await fetch(SIGNPOST_API_URL, {
+            // Route through WordPress admin-ajax.php so API credentials stay server-side
+            const response = await fetch(giannisConfig.apiUrl, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: JSON.stringify(payload)
+                body: new URLSearchParams({
+                    action: 'giannis_send_message',
+                    nonce: giannisConfig.nonce,
+                    message: userMessage,
+                    session_id: apiSessionId
+                })
             });
 
-            console.log('📥 API Response status:', response.status);
+            console.log('📥 admin-ajax response status:', response.status);
 
             if (!response.ok) {
-                // Try to get error details from response
                 const errorText = await response.text();
-                console.error('❌ API Error Response:', errorText);
-                throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+                console.error('❌ admin-ajax Error Response:', errorText);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const data = await response.json();
-            console.log('✅ API Response data:', data);
+            const result = await response.json();
+            console.log('✅ admin-ajax Response data:', result);
             removeTypingIndicator(typingId);
 
-            const botReply = data.message || data.response || "I'm sorry, I didn't understand that.";
-
-            appendMessage('bot', botReply);
-            saveMessageToState('bot', botReply);
+            if (result.success) {
+                const botReply = result.data.message || result.data.response || "I'm sorry, I didn't understand that.";
+                appendMessage('bot', botReply);
+                saveMessageToState('bot', botReply);
+            } else {
+                const errorMsg = result.data?.message || "Unexpected error from server.";
+                throw new Error(errorMsg);
+            }
 
         } catch (error) {
             console.error("🔴 API Error:", error);
@@ -880,29 +920,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    /**
+     * parseContent - V3 Source Extraction
+     *
+     * The V3 RAG API appends sources to the end of the message text like:
+     *   [Main bot message]\n\nSources: File1.pdf, File2.pdf
+     *
+     * Regex: /[\r\n]+\s*(?:Sources?|Fonti)\s*:\s*(.+)$/is
+     *   - [\r\n]+        One or more line breaks (handles \r\n and \n)
+     *   - \s*            Optional whitespace before the keyword
+     *   - (?:Sources?|Fonti)  Matches "Source", "Sources", or "Fonti"
+     *   - \s*:\s*         Colon with optional surrounding whitespace
+     *   - (.+)$          Captures everything after (the file name list)
+     *   - /is            Case-insensitive, dotAll (. matches newlines)
+     */
     function parseContent(text) {
         if (!text) return "";
 
-        const sourceRegex = /(\n\s*(?:Sources?|Fonti):[\s\S]*)$/i;
+        const sourceRegex = /[\r\n]+\s*(?:Sources?|Fonti)\s*:\s*(.+)$/is;
         const match = text.match(sourceRegex);
 
         let mainText = text;
-        let sourcesText = "";
+        let extractedSourceNames = [];
 
         if (match) {
-            sourcesText = match[1];
+            // Strip the entire "Sources: ..." block from the main text
             mainText = text.substring(0, match.index);
+
+            // Split the captured file names by comma and clean each one
+            extractedSourceNames = match[1]
+                .split(',')
+                .map(s => s.trim())
+                .filter(s => s.length > 0 && s.toLowerCase() !== 'none used');
         }
 
         let html = formatMarkdown(mainText);
 
-        if (sourcesText) {
-            const cleanSources = sourcesText.trim();
-            const formattedSources = formatMarkdown(cleanSources);
+        // Render the sources footer only if real file names were extracted
+        if (extractedSourceNames.length > 0) {
+            // HTML-escape each file name for safety
+            const temp = document.createElement('div');
+            const sourceItems = extractedSourceNames.map(name => {
+                temp.textContent = name;
+                return `<span class="source-item">📄 ${temp.innerHTML}</span>`;
+            }).join('');
 
             html += `
                 <div class="message-sources">
-                    ${formattedSources}
+                    <strong>Sources:</strong> ${sourceItems}
                 </div>
             `;
         }

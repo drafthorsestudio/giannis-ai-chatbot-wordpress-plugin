@@ -29,6 +29,23 @@ class Giannis_Chatbot_API {
         // Hook per l'invio messaggi
         add_action('wp_ajax_giannis_send_message', array($this, 'send_message'));
         add_action('wp_ajax_nopriv_giannis_send_message', array($this, 'send_message'));
+
+        // Hook per il refresh del nonce (cache-proof)
+        add_action('wp_ajax_giannis_refresh_nonce', array($this, 'refresh_nonce'));
+        add_action('wp_ajax_nopriv_giannis_refresh_nonce', array($this, 'refresh_nonce'));
+    }
+
+    /**
+     * DYNAMIC NONCE REFRESH
+     * Returns a fresh nonce to the frontend. This endpoint is public (nopriv)
+     * so it works even when the page HTML is served from Pantheon's cache
+     * and the original nonce embedded in the page has expired.
+     */
+    public function refresh_nonce() {
+        wp_send_json_success(array(
+            'nonce' => wp_create_nonce('giannis_chatbot_nonce')
+        ));
+        wp_die();
     }
     
     /**
