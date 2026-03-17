@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('GIANNIS_CHATBOT_VERSION', '1.2.0');
+define('GIANNIS_CHATBOT_VERSION', '1.2.5');
 define('GIANNIS_CHATBOT_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('GIANNIS_CHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
 
