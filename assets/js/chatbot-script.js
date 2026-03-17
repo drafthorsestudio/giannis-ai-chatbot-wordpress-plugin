@@ -946,7 +946,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function parseContent(text) {
         if (!text) return "";
 
-        const sourceRegex = /[\r\n\s]*(?:<[^>]*>)*[*_]{0,3}(?:Sources?|Fonti)[*_]{0,3}(?:<[^>]*>)*\s*:\s*(.+)$/is;
+        const sourceRegex = /(?:\.|\s|<br>)*(?:Sources?|Fonti)\s*:\s*(.+)$/is;
         const match = text.match(sourceRegex);
 
         let mainText = text;
