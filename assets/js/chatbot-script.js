@@ -921,54 +921,91 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     /**
-     * parseContent - V3 Source Extraction (Robust)
+     * parseContent - V3 Source Extraction (Bulletproof)
      *
-     * The V3 RAG API appends sources to the end of the message text in
-     * various formats:
-     *   - Sources: File1.pdf, File2.pdf
-     *   - **Sources:** File1.pdf, File2.pdf
-     *   - <strong>Sources:</strong> File1.pdf
-     *   - \n\nSources: File1.pdf
-     *   - Source: File1.pdf (singular)
-     *   - Fonti: File1.pdf (Italian)
+     * Two-pass extraction:
+     *   Pass 1: Try regex on the raw text as-is
+     *   Pass 2: If no match, normalize the text (strip markdown/HTML) and retry
      *
-     * Regex breakdown (each part):
-     *   [\r\n\s]*       Zero or more whitespace/line breaks (tolerates missing \n)
-     *   (?:<[^>]*>)*    Optional HTML tags wrapping the keyword (e.g. <strong>)
-     *   [*_]{0,3}       Optional markdown bold/italic (**, *, __, _)
-     *   (?:Sources?|Fonti)  The keyword itself
-     *   [*_]{0,3}       Closing markdown bold/italic
-     *   (?:<[^>]*>)*    Closing HTML tags
-     *   \s*:\s*         Colon with flexible whitespace
-     *   (.+)$           Capture the file name list
-     *   /is             Case-insensitive, dotAll
+     * Also logs the tail of each bot response for debugging.
      */
     function parseContent(text) {
         if (!text) return "";
 
-        const sourceRegex = /(?:\.|\s|<br>)*(?:Sources?|Fonti)\s*:\s*(.+)$/is;
-        const match = text.match(sourceRegex);
+        // DEBUG: Log the last 200 chars so we can see exactly what the API sends
+        console.log('🔍 parseContent input (last 200 chars):', JSON.stringify(text.slice(-200)));
+
+        // The core regex: matches "Sources:", "Source:", or "Fonti:" followed by the list
+        // (?:\.|\s|<br\s*\/?>)* — tolerates periods, whitespace, or <br> tags before keyword
+        // [*_]{0,3} — optional markdown bold/italic around keyword
+        // \s*:?\s* — colon is made optional (some formats put colon inside the bold)
+        // (.+) — capture everything after
+        const sourcePattern = /(?:\.|\s|<br\s*\/?>)*[*_]{0,3}(?:Sources?|Fonti)[*_]{0,3}\s*:?\s*[:]\s*(.+)$/is;
+
+        // Pass 1: Try on raw text with a simpler, broader regex
+        const simpleRegex = /(?:Sources?|Fonti)\s*:\s*(.+)$/is;
+        let match = text.match(simpleRegex);
 
         let mainText = text;
         let extractedSourceNames = [];
 
         if (match) {
-            // Strip the entire "Sources: ..." block from the main text
-            mainText = text.substring(0, match.index);
+            console.log('✅ Source regex matched (raw text). Captured:', match[1]);
+            mainText = text.substring(0, match.index).replace(/[\s\n\r.]+$/, '');
 
-            // Split the captured file names by comma and clean each one
-            // Also strip any residual markdown/HTML artifacts from each name
             extractedSourceNames = match[1]
                 .split(',')
                 .map(s => s.trim().replace(/[*_`]/g, '').replace(/<[^>]*>/g, '').trim())
-                .filter(s => s.length > 0 && s.toLowerCase() !== 'none used');
+                .filter(s => {
+                    const lower = s.toLowerCase().replace(/\.$/, '');
+                    return s.length > 0
+                        && lower !== 'none used'
+                        && lower !== 'none'
+                        && lower !== 'n/a'
+                        && lower !== 'nessuna';
+                });
+        } else {
+            console.warn('⚠️ Source regex did NOT match raw text. Trying normalized pass...');
+
+            // Pass 2: Normalize — strip markdown bold, HTML tags, normalize whitespace
+            const normalized = text
+                .replace(/\*\*/g, '')
+                .replace(/<[^>]*>/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+
+            match = normalized.match(simpleRegex);
+
+            if (match) {
+                console.log('✅ Source regex matched (normalized). Captured:', match[1]);
+
+                // Find where to cut in the ORIGINAL text
+                // Search backwards for the keyword in the original
+                const keywordIdx = text.search(/(?:Sources?|Fonti)\s*:/i);
+                if (keywordIdx > -1) {
+                    mainText = text.substring(0, keywordIdx).replace(/[\s\n\r.*_]+$/, '');
+                }
+
+                extractedSourceNames = match[1]
+                    .split(',')
+                    .map(s => s.trim().replace(/[*_`]/g, '').replace(/<[^>]*>/g, '').trim())
+                    .filter(s => {
+                        const lower = s.toLowerCase().replace(/\.$/, '');
+                        return s.length > 0
+                            && lower !== 'none used'
+                            && lower !== 'none'
+                            && lower !== 'n/a'
+                            && lower !== 'nessuna';
+                    });
+            } else {
+                console.warn('⚠️ No sources found in this message.');
+            }
         }
 
         let html = formatMarkdown(mainText);
 
         // Render the sources footer only if real file names were extracted
         if (extractedSourceNames.length > 0) {
-            // HTML-escape each file name for safety
             const temp = document.createElement('div');
             const sourceItems = extractedSourceNames.map(name => {
                 temp.textContent = name;
