@@ -921,23 +921,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     /**
-     * parseContent - V3 Source Extraction
+     * parseContent - V3 Source Extraction (Robust)
      *
-     * The V3 RAG API appends sources to the end of the message text like:
-     *   [Main bot message]\n\nSources: File1.pdf, File2.pdf
+     * The V3 RAG API appends sources to the end of the message text in
+     * various formats:
+     *   - Sources: File1.pdf, File2.pdf
+     *   - **Sources:** File1.pdf, File2.pdf
+     *   - <strong>Sources:</strong> File1.pdf
+     *   - \n\nSources: File1.pdf
+     *   - Source: File1.pdf (singular)
+     *   - Fonti: File1.pdf (Italian)
      *
-     * Regex: /[\r\n]+\s*(?:Sources?|Fonti)\s*:\s*(.+)$/is
-     *   - [\r\n]+        One or more line breaks (handles \r\n and \n)
-     *   - \s*            Optional whitespace before the keyword
-     *   - (?:Sources?|Fonti)  Matches "Source", "Sources", or "Fonti"
-     *   - \s*:\s*         Colon with optional surrounding whitespace
-     *   - (.+)$          Captures everything after (the file name list)
-     *   - /is            Case-insensitive, dotAll (. matches newlines)
+     * Regex breakdown (each part):
+     *   [\r\n\s]*       Zero or more whitespace/line breaks (tolerates missing \n)
+     *   (?:<[^>]*>)*    Optional HTML tags wrapping the keyword (e.g. <strong>)
+     *   [*_]{0,3}       Optional markdown bold/italic (**, *, __, _)
+     *   (?:Sources?|Fonti)  The keyword itself
+     *   [*_]{0,3}       Closing markdown bold/italic
+     *   (?:<[^>]*>)*    Closing HTML tags
+     *   \s*:\s*         Colon with flexible whitespace
+     *   (.+)$           Capture the file name list
+     *   /is             Case-insensitive, dotAll
      */
     function parseContent(text) {
         if (!text) return "";
 
-        const sourceRegex = /[\r\n]+\s*(?:Sources?|Fonti)\s*:\s*(.+)$/is;
+        const sourceRegex = /[\r\n\s]*(?:<[^>]*>)*[*_]{0,3}(?:Sources?|Fonti)[*_]{0,3}(?:<[^>]*>)*\s*:\s*(.+)$/is;
         const match = text.match(sourceRegex);
 
         let mainText = text;
@@ -948,9 +957,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             mainText = text.substring(0, match.index);
 
             // Split the captured file names by comma and clean each one
+            // Also strip any residual markdown/HTML artifacts from each name
             extractedSourceNames = match[1]
                 .split(',')
-                .map(s => s.trim())
+                .map(s => s.trim().replace(/[*_`]/g, '').replace(/<[^>]*>/g, '').trim())
                 .filter(s => s.length > 0 && s.toLowerCase() !== 'none used');
         }
 

@@ -142,7 +142,7 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
                             </button>
                         </div>
                     </form>
-                    <div class="disclaimer"><?php esc_html_e('Giannis can make mistakes as it is still in a pilot phase. It is not for emergencies. Please click here for important information.', 'giannis-ai-chatbot'); ?></div>
+                    <div class="disclaimer"><?php esc_html_e('Giannis can make mistakes as it is still in a pilot phase. It is not for emergencies.', 'giannis-ai-chatbot'); ?> <a href="https://www.antitraffickingresponse.org/data-and-privacy-policy/" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Please click here for important information.', 'giannis-ai-chatbot'); ?></a></div>
                 </div>
             </div>
         </main>

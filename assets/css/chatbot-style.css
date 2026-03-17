@@ -625,6 +625,7 @@
 .giannis-chatbot-wrapper .chat-messages {
     flex: 1 !important;
     overflow-y: auto !important;
+    max-height: 60vh !important;
     padding: 2rem 0 15rem 0 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -1102,6 +1103,16 @@ body.dark-mode .starter-chip:hover {
 .giannis-chatbot-wrapper .input-area-container:not(.centered) .disclaimer,
 .giannis-chatbot-wrapper .input-area-container.centered .disclaimer {
     opacity: 1;
+}
+
+.giannis-chatbot-wrapper .disclaimer a {
+    color: inherit !important;
+    text-decoration: underline !important;
+    transition: color var(--transition-fast);
+}
+
+.giannis-chatbot-wrapper .disclaimer a:hover {
+    color: var(--accent-color) !important;
 }
 
 /* ================================================
