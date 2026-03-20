@@ -3,7 +3,7 @@
  * Plugin Name: Giannis AI Chatbot
  * Plugin URI: https://antitraffickingresponse.org
  * Description: A modern AI chatbot interface powered by Signpost AI
- * Version: 1.0.9
+ * Version: 1.2.4
  * Author: IRC AT
  * Author URI: https://antitraffickingresponse.org
  * License: GPL v2 or later
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('GIANNIS_CHATBOT_VERSION', '1.0.6');
+define('GIANNIS_CHATBOT_VERSION', '1.2.4');
 define('GIANNIS_CHATBOT_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('GIANNIS_CHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -66,20 +66,20 @@ class Giannis_AI_Chatbot {
                 null
             );
             
-            // Main plugin CSS with all fixes
+            // Main plugin CSS
             wp_enqueue_style(
                 'giannis-chatbot-style',
                 GIANNIS_CHATBOT_PLUGIN_URL . 'assets/css/chatbot-style.css',
                 array(),
-                GIANNIS_CHATBOT_VERSION . '.1' // Bump version to force cache refresh
+                GIANNIS_CHATBOT_VERSION
             );
             
-            // JavaScript
+            // JavaScript - Version 1.2.2 with Firefox NS_BINDING_ABORTED fix
             wp_enqueue_script(
                 'giannis-chatbot-script',
                 GIANNIS_CHATBOT_PLUGIN_URL . 'assets/js/chatbot-script.js',
                 array('jquery'),
-                GIANNIS_CHATBOT_VERSION . '.1', // Bump version
+                GIANNIS_CHATBOT_VERSION,
                 true
             );
             
@@ -105,7 +105,6 @@ class Giannis_AI_Chatbot {
     }
     
     public function activate() {
-        // Set default options
         if (!get_option('giannis_chatbot_settings')) {
             add_option('giannis_chatbot_settings', array(
                 'api_url' => 'https://signpost-ia-app.azurewebsites.net/agent',
@@ -113,13 +112,10 @@ class Giannis_AI_Chatbot {
                 'agent_id' => ''
             ));
         }
-        
-        // Flush rewrite rules
         flush_rewrite_rules();
     }
     
     public function deactivate() {
-        // Flush rewrite rules
         flush_rewrite_rules();
     }
 }
