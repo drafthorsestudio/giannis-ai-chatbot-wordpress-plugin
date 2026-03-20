@@ -66,14 +66,14 @@
 
     /* Typography Scale */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-size-xs: clamp(1rem, .0875vw + 1rem, 1.1rem);
-    --font-size-sm: clamp(1.25rem, 1.1vw + 1rem, 1.33rem);
-    --font-size-base: clamp(1.5rem, 1.33vw + 1rem, 1.75rem);
-    --font-size-lg: clamp(1.75rem, 1.65vw + 1rem, 2.5rem);
-    --font-size-xl: clamp(1.8rem, 2.25vw + 1rem, 3rem);
-    --font-size-2xl: clamp(2rem, 2.5vw + 1rem, 4rem);
-    --font-size-3xl: clamp(3rem, 3.25vw + 1rem, 4rem);
-    --font-size-4xl: clamp(4rem, 3.75vw + 1rem, 4rem);
+    --font-size-xs: clamp(1rem,.0875vw + 1rem,1.1rem);
+    --font-size-sm: clamp(1.25rem,1.1vw + 1rem,1.33rem);
+    --font-size-base: clamp(1.5rem,1.33vw + 1rem,1.75rem);
+    --font-size-lg: clamp(1.75rem,1.65vw + 1rem, 2.5rem);
+    --font-size-xl: clamp(1.8rem,2.25vw + 1rem,3rem);
+    --font-size-2xl: clamp(2rem,2.5vw + 1rem,4rem);
+    --font-size-3xl: clamp(3rem,3.25vw + 1rem,4rem);
+    --font-size-4xl: clamp(4rem,3.75vw + 1rem,4rem);
 
     /* Line Heights */
     --line-height-tight: 1.25;
@@ -380,12 +380,9 @@
 }
 
 @keyframes subtlePulse {
-
-    0%,
-    100% {
+    0%, 100% {
         box-shadow: 0 0 0 0 rgba(255, 194, 14, 0.4);
     }
-
     50% {
         box-shadow: 0 0 0 8px rgba(255, 194, 14, 0);
     }
@@ -624,15 +621,14 @@
     border-bottom: 1px solid var(--border-light) !important;
 }
 
+/* Chat Messages */
 .giannis-chatbot-wrapper .chat-messages {
     flex: 1 !important;
     overflow-y: auto !important;
-    max-height: 60vh !important;
-    padding: 1rem 1rem 2rem 1rem !important;
-    /* Rimosso l'enorme 15rem! */
+    padding: 2rem 0 15rem 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 1.5rem !important;
+    gap: 2rem !important;
     background: transparent !important;
 }
 
@@ -728,7 +724,6 @@
         opacity: 0;
         transform: translateY(30px) scale(0.95);
     }
-
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -885,28 +880,11 @@
 .giannis-chatbot-wrapper .message-sources strong {
     font-weight: 600 !important;
     color: var(--text-primary) !important;
-    display: inline !important;
-    margin-right: 6px !important;
+    display: block !important;
+    margin-bottom: 6px !important;
     text-transform: uppercase !important;
     font-size: var(--font-size-xs) !important;
     letter-spacing: var(--tracking-wide) !important;
-}
-
-.giannis-chatbot-wrapper .source-item {
-    display: inline-block !important;
-    background: rgba(0, 0, 0, 0.05) !important;
-    border: 1px solid var(--border-light) !important;
-    border-radius: var(--radius-xs) !important;
-    padding: 2px 8px !important;
-    margin: 3px 4px 3px 0 !important;
-    font-size: var(--font-size-xs) !important;
-    color: var(--text-secondary) !important;
-    white-space: nowrap !important;
-}
-
-.giannis-chatbot-wrapper.dark-mode .source-item {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 /* ================================================
@@ -924,16 +902,13 @@
 }
 
 .giannis-chatbot-wrapper .input-area-container.centered {
-    bottom: 20% !important;
+    bottom: 15% !important;
     transform: translateY(50%) !important;
     background: transparent !important;
 }
 
-/* Input area - chat mode (not centered) */
 .giannis-chatbot-wrapper .input-area-container:not(.centered) {
-    background: linear-gradient(180deg, rgba(248, 249, 250, 0) 0%, var(--bg-body) 100%) !important;
-    padding-top: 0.5rem !important;
-    max-height: 120px !important;
+    background: linear-gradient(180deg, rgba(248, 249, 250, 0) 0%, var(--bg-body) 40%) !important;
 }
 
 /* Quick Starter Language Buttons */
@@ -1002,7 +977,6 @@ body.dark-mode .starter-chip:hover {
     margin: 0 auto;
     width: 100%;
 }
-
 .giannis-chatbot-wrapper .input-area {
     max-width: 900px !important;
     margin: 0 auto !important;
@@ -1113,39 +1087,25 @@ body.dark-mode .starter-chip:hover {
     opacity: 1;
 }
 
-.giannis-chatbot-wrapper .disclaimer a {
-    color: inherit !important;
-    text-decoration: underline !important;
-    transition: color var(--transition-fast);
-}
-
-.giannis-chatbot-wrapper .disclaimer a:hover {
-    color: var(--accent-color) !important;
-}
-
 /* ================================================
    TYPING INDICATOR - FIXED FOR HORIZONTAL DISPLAY
    ================================================ */
 .giannis-chatbot-wrapper .typing-indicator {
     display: flex !important;
-    flex-direction: row !important;
-    /* Force horizontal layout */
+    flex-direction: row !important; /* Force horizontal layout */
     align-items: center !important;
     justify-content: flex-start !important;
     gap: 6px !important;
     padding: 8px 4px !important;
     min-height: 24px !important;
     width: auto !important;
-    white-space: nowrap !important;
-    /* Prevent wrapping */
+    white-space: nowrap !important; /* Prevent wrapping */
     overflow: visible !important;
-    flex-wrap: nowrap !important;
-    /* Prevent flex wrapping */
+    flex-wrap: nowrap !important; /* Prevent flex wrapping */
 }
 
 .giannis-chatbot-wrapper .typing-dot {
-    display: inline-block !important;
-    /* Ensure inline display */
+    display: inline-block !important; /* Ensure inline display */
     width: 8px !important;
     height: 8px !important;
     min-width: 8px !important;
@@ -1153,25 +1113,19 @@ body.dark-mode .starter-chip:hover {
     background-color: var(--accent-color) !important;
     border-radius: 50% !important;
     animation: typingBounce 1.4s infinite ease-in-out both;
-    margin: 0 !important;
-    /* Reset margins */
-    padding: 0 !important;
-    /* Reset padding */
+    margin: 0 !important; /* Reset margins */
+    padding: 0 !important; /* Reset padding */
     vertical-align: middle !important;
-    float: none !important;
-    /* Prevent floating */
-    position: relative !important;
-    /* Prevent absolute positioning */
-    flex-shrink: 0 !important;
-    /* Prevent dots from shrinking */
+    float: none !important; /* Prevent floating */
+    position: relative !important; /* Prevent absolute positioning */
+    flex-shrink: 0 !important; /* Prevent dots from shrinking */
 }
 
 /* Ensure proper message content display for typing indicator */
 .giannis-chatbot-wrapper .bot-message .message-content:has(.typing-indicator) {
     display: flex !important;
     align-items: center !important;
-    min-width: 60px !important;
-    /* Minimum width for 3 dots */
+    min-width: 60px !important; /* Minimum width for 3 dots */
 }
 
 .giannis-chatbot-wrapper .typing-dot:nth-child(1) {
@@ -1187,14 +1141,10 @@ body.dark-mode .starter-chip:hover {
 }
 
 @keyframes typingBounce {
-
-    0%,
-    80%,
-    100% {
+    0%, 80%, 100% {
         transform: scale(0);
         opacity: 0.5;
     }
-
     40% {
         transform: scale(1);
         opacity: 1;
@@ -1260,18 +1210,17 @@ body .giannis-chatbot-wrapper .typing-dot {
    ================================================ */
 
 @media (max-width: 1300px) {
-    .giannis-chatbot-wrapper .welcome-text {
+       .giannis-chatbot-wrapper .welcome-text {
         font-size: var(--font-size-3xl) !important;
     }
 }
 
 @media (max-width: 1120px) {
-    .giannis-chatbot-wrapper .welcome-text {
+       .giannis-chatbot-wrapper .welcome-text {
         font-size: var(--font-size-2xl) !important;
         flex-direction: column !important;
     }
-
-    /* Welcome Container */
+	/* Welcome Container */
     .giannis-chatbot-wrapper .welcome-container {
         top: 33% !important;
     }
@@ -1432,42 +1381,42 @@ body .giannis-chatbot-wrapper .typing-dot {
 .giannis-chatbot-wrapper .message-content {
     /* Keep normal white-space handling for most text */
     white-space: normal !important;
-
+    
     /* Ensure overflow is visible */
     overflow: visible !important;
     overflow-wrap: break-word !important;
     word-wrap: break-word !important;
-
+    
     /* Slightly increased line height for better emoji rendering */
     line-height: 1.75 !important;
-
+    
     /* Ensure adequate padding so nothing gets cut off */
     padding-right: 2rem !important;
     padding-bottom: 1.25rem !important;
-
+    
     /* Force block display to prevent inline issues */
     display: block !important;
 }
 
 /* Fix for the content wrapper div - the key is display and overflow */
-.giannis-chatbot-wrapper .message-content>div:not(.message-sources) {
+.giannis-chatbot-wrapper .message-content > div:not(.message-sources) {
     display: block !important;
     width: 100% !important;
     overflow: visible !important;
     position: relative !important;
     z-index: 1 !important;
-
+    
     /* Use normal white-space but ensure word breaking works */
     white-space: normal !important;
     word-break: break-word !important;
     overflow-wrap: break-word !important;
-
+    
     /* Minimum height to ensure content is visible */
     min-height: 1.5em !important;
 }
 
 /* Special handling for lines containing emojis using CSS content inspection */
-.giannis-chatbot-wrapper .message-content>div {
+.giannis-chatbot-wrapper .message-content > div {
     /* Reset any potential text-overflow or clip */
     text-overflow: visible !important;
     clip: auto !important;
@@ -1483,7 +1432,7 @@ body .giannis-chatbot-wrapper .typing-dot {
     height: auto !important;
     min-height: auto !important;
     max-height: none !important;
-
+    
     /* Clear any float issues that might hide text */
     clear: both !important;
 }
@@ -1503,7 +1452,7 @@ body .giannis-chatbot-wrapper .typing-dot {
 .giannis-chatbot-wrapper .message-content {
     /* Include emoji-capable fonts in the stack */
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif !important;
-
+    
     /* Prevent font-variant issues that might affect emoji rendering */
     font-variant: normal !important;
     font-variant-ligatures: normal !important;
@@ -1534,12 +1483,12 @@ body .giannis-chatbot-wrapper .typing-dot {
     flex-shrink: 0 !important;
 }
 
-.giannis-chatbot-wrapper .message-content>div:not(.message-sources) {
+.giannis-chatbot-wrapper .message-content > div:not(.message-sources) {
     flex: 1 1 auto !important;
 }
 
 /* Last resort: Force minimum dimensions for content visibility */
-.giannis-chatbot-wrapper .bot-message .message-content>div[data-raw-markdown] {
+.giannis-chatbot-wrapper .bot-message .message-content > div[data-raw-markdown] {
     min-height: 2em !important;
     padding-bottom: 0.5em !important;
 }

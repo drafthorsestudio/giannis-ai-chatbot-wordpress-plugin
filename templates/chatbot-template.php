@@ -1,19 +1,18 @@
 <?php
 /**
- * Giannis AI Chatbot Template - t
+ * Giannis AI Chatbot Template
+ * Version: 1.2.2 - Firefox compatibility fix
  * 
- * This template renders the chatbot interface when the [giannis_chatbot] shortcode is used.
- * 
- * @package Giannis_AI_Chatbot
- * @since 1.1.0
- * */
+ * Key change: Send button now has type="button" instead of type="submit"
+ * to prevent Firefox from treating it as a form submission.
+ */
 
 // Prevent direct access
 if (!defined('ABSPATH')) {
     exit;
 }
 
-// Get shortcode attributes (passed from shortcode handler)
+// Get shortcode attributes
 $height = isset($atts['height']) ? esc_attr($atts['height']) : '600px';
 $width = isset($atts['width']) ? esc_attr($atts['width']) : '100%';
 $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
@@ -32,7 +31,7 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
 
             <!-- Primary Actions -->
             <div class="sidebar-actions">
-                <button class="new-chat-btn" id="newChatBtn">
+                <button type="button" class="new-chat-btn" id="newChatBtn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -60,7 +59,7 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
 
             <!-- Sidebar Footer -->
             <div class="sidebar-footer">
-                <button class="theme-toggle" id="themeToggle" aria-label="<?php esc_attr_e('Toggle theme', 'giannis-ai-chatbot'); ?>">
+                <button type="button" class="theme-toggle" id="themeToggle" aria-label="<?php esc_attr_e('Toggle theme', 'giannis-ai-chatbot'); ?>">
                     <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
@@ -77,7 +76,7 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
                 </button>
                 
                 <!-- Clear All Chats Button -->
-                <button class="clear-all-btn" id="chatbot-clear-all" title="<?php esc_attr_e('Cancella tutte le chat', 'giannis-ai-chatbot'); ?>">
+                <button type="button" class="clear-all-btn" id="chatbot-clear-all" title="<?php esc_attr_e('Cancella tutte le chat', 'giannis-ai-chatbot'); ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="3 6 5 6 21 6"></polyline>
@@ -87,7 +86,7 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
                     </svg>
                 </button>
 
-                <button class="sidebar-toggle" id="sidebarToggle" aria-label="<?php esc_attr_e('Toggle Sidebar', 'giannis-ai-chatbot'); ?>">
+                <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="<?php esc_attr_e('Toggle Sidebar', 'giannis-ai-chatbot'); ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -131,10 +130,12 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
                         <button type="button" class="starter-chip" data-message="مرحبا">AR مرحبا 👋</button>
                     </div>
                     
-                    <form id="chatForm" class="chat-form">
+                    <!-- CRITICAL: Using onsubmit="return false" as extra protection -->
+                    <form id="chatForm" class="chat-form" onsubmit="return false;" action="javascript:void(0);">
                         <div class="input-wrapper">
                             <textarea id="userInput" placeholder="<?php esc_attr_e('Message Giannis...', 'giannis-ai-chatbot'); ?>" rows="1"></textarea>
-                            <button type="submit" id="sendBtn" disabled aria-label="<?php esc_attr_e('Send message', 'giannis-ai-chatbot'); ?>">
+                            <!-- CRITICAL: type="button" prevents form submission in Firefox -->
+                            <button type="button" id="sendBtn" disabled aria-label="<?php esc_attr_e('Send message', 'giannis-ai-chatbot'); ?>">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                     width="20" height="20">
                                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
@@ -142,15 +143,19 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
                             </button>
                         </div>
                     </form>
-                    <div class="disclaimer"><?php esc_html_e('Giannis can make mistakes as it is still in a pilot phase. It is not for emergencies.', 'giannis-ai-chatbot'); ?> <a href="https://www.antitraffickingresponse.org/data-and-privacy-policy/" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Please click here for important information.', 'giannis-ai-chatbot'); ?></a></div>
-                </div>
+                        <div class="disclaimer">
+                            <?php esc_html_e('Giannis can make mistakes as it is still in a pilot phase. It is not for emergencies.', 'giannis-ai-chatbot'); ?>
+                            <a href="<?php echo esc_url(home_url('/data-and-privacy-policy/')); ?>" target="_blank" rel="noopener noreferrer">
+                                <?php esc_html_e('Please click here for important information.', 'giannis-ai-chatbot'); ?>
+                            </a>
+                        </div>                </div>
             </div>
         </main>
     </div>
 </div>
 
 <style>
-/* CRITICAL INLINE STYLES - Ensures core layout works even if external CSS fails */
+/* CRITICAL INLINE STYLES - Ensures core layout works */
 .giannis-chatbot-wrapper {
     display: block !important;
     position: relative !important;
@@ -172,7 +177,6 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
     box-sizing: border-box !important;
 }
 
-/* THE MOST CRITICAL LAYOUT RULES */
 .giannis-chatbot-wrapper .app-container {
     display: flex !important;
     flex-direction: row !important;
@@ -183,9 +187,6 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
 }
 
 .giannis-chatbot-wrapper .sidebar {
-    /*width: 280px !important;
-    min-width: 280px !important;
-    max-width: 280px !important;*/
     background-color: rgba(0, 0, 0, 0.95) !important;
     color: #ffffff !important;
     display: flex !important;
@@ -206,5 +207,4 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
     display: flex !important;
     flex-direction: row !important;
 }
-
 </style>

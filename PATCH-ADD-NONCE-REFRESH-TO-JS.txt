@@ -1,0 +1,130 @@
+/**
+ * PATCH: Add Nonce Refresh to Version 1.2.4 JavaScript
+ * 
+ * This patch adds Pantheon-compatible nonce refresh to your working 1.2.4 code.
+ * Apply this AFTER line 96 (after universalPost function)
+ */
+
+// ==================================================
+// ADD THIS NEW FUNCTION after universalPost (around line 97)
+// ==================================================
+
+/**
+ * NEW: Dynamic Nonce Refresh (Pantheon Cache Fix)
+ * Fetches a fresh nonce from server to bypass cached page nonces
+ */
+async function refreshNonce() {
+    try {
+        console.log('🔑 Refreshing nonce...');
+        const response = await universalPost(giannisConfig.apiUrl, {
+            action: 'giannis_refresh_nonce'
+        });
+
+        if (response.success && response.data.nonce) {
+            giannisConfig.nonce = response.data.nonce;
+            console.log('✅ Nonce refreshed successfully');
+            return true;
+        } else {
+            console.warn('⚠️ Nonce refresh response was not successful');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Failed to refresh nonce:', error);
+        return false;
+    }
+}
+
+// ==================================================
+// MODIFY loadConfig function (around line 99-115)
+// ==================================================
+
+// FIND THIS:
+async function loadConfig() {
+    try {
+        const result = await universalPost(giannisConfig.apiUrl, {
+            action: 'giannis_get_config',
+            nonce: giannisConfig.nonce
+        });
+
+// REPLACE WITH THIS:
+async function loadConfig() {
+    try {
+        // Refresh nonce first (Pantheon cache fix)
+        await refreshNonce();
+        
+        const result = await universalPost(giannisConfig.apiUrl, {
+            action: 'giannis_get_config',
+            nonce: giannisConfig.nonce
+        });
+
+// ==================================================
+// MODIFY callSignpostAI function (around line 450-480)
+// ==================================================
+
+// FIND THIS CODE (inside callSignpostAI, before the API call):
+async function callSignpostAI(userMessage) {
+    const typingId = showTypingIndicator();
+    
+    try {
+        console.log('📤 Sending message via admin-ajax (giannis_send_message)');
+        
+        const result = await universalPost(giannisConfig.apiUrl, {
+            action: 'giannis_send_message',
+            nonce: giannisConfig.nonce,
+            message: userMessage,
+            session_id: currentChatId ? `chat-${currentChatId}` : `user-${Date.now()}`
+        });
+
+// REPLACE WITH THIS (add nonce refresh before each message):
+async function callSignpostAI(userMessage) {
+    const typingId = showTypingIndicator();
+    
+    try {
+        // Refresh nonce before each message (Pantheon cache fix)
+        await refreshNonce();
+        
+        console.log('📤 Sending message via admin-ajax (giannis_send_message)');
+        
+        const result = await universalPost(giannisConfig.apiUrl, {
+            action: 'giannis_send_message',
+            nonce: giannisConfig.nonce,
+            message: userMessage,
+            session_id: currentChatId ? `chat-${currentChatId}` : `user-${Date.now()}`
+        });
+
+// ==================================================
+// THAT'S IT! Three simple changes:
+// ==================================================
+// 1. Add refreshNonce() function
+// 2. Call it in loadConfig()
+// 3. Call it in callSignpostAI()
+//
+// Your working 1.2.4 code stays exactly the same, we just add
+// nonce refresh before API calls to handle Pantheon caching.
+// ==================================================
+
+/**
+ * FULL FILE HEADER - Update version comment at top of file
+ */
+
+// FIND THIS (lines 1-9):
+/**
+ * Giannis AI Chatbot - WordPress Plugin JavaScript
+ * Version: 1.2.2 - FIX FOR FIREFOX NS_BINDING_ABORTED
+ * 
+ * Key fix: More aggressive form submission prevention to stop Firefox
+ * from aborting AJAX requests due to page navigation.
+ */
+
+// REPLACE WITH THIS:
+/**
+ * Giannis AI Chatbot - WordPress Plugin JavaScript
+ * Version: 1.3.0 - Complete Edition
+ * 
+ * Includes ALL fixes:
+ * - Firefox NS_BINDING_ABORTED fix (type="button")
+ * - Language button persistence fix (hidden-starters class)
+ * - Nonce refresh for Pantheon cache compatibility
+ * - XHR fallback for fetch() failures
+ * - Error handling and user-friendly messages
+ */
