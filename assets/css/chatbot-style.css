@@ -64,16 +64,16 @@
     --border-light: rgba(0, 0, 0, 0.06);
     --border-medium: rgba(0, 0, 0, 0.12);
 
-    /* Typography Scale */
+    /* Typography Scale — all clamp values scaled ×0.85 for ~15% size reduction */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-size-xs: clamp(1rem,.0875vw + 1rem,1.1rem);
-    --font-size-sm: clamp(1.25rem,1.1vw + 1rem,1.33rem);
-    --font-size-base: clamp(1.5rem,1.33vw + 1rem,1.75rem);
-    --font-size-lg: clamp(1.75rem,1.65vw + 1rem, 2.5rem);
-    --font-size-xl: clamp(1.8rem,2.25vw + 1rem,3rem);
-    --font-size-2xl: clamp(2rem,2.5vw + 1rem,4rem);
-    --font-size-3xl: clamp(3rem,3.25vw + 1rem,4rem);
-    --font-size-4xl: clamp(4rem,3.75vw + 1rem,4rem);
+    --font-size-xs: clamp(0.85rem, .0744vw + 0.85rem, 0.935rem);
+    --font-size-sm: clamp(1.0625rem, 0.935vw + 0.85rem, 1.1305rem);
+    --font-size-base: clamp(1.275rem, 1.1305vw + 0.85rem, 1.4875rem);
+    --font-size-lg: clamp(1.4875rem, 1.4025vw + 0.85rem, 2.125rem);
+    --font-size-xl: clamp(1.53rem, 1.9125vw + 0.85rem, 2.55rem);
+    --font-size-2xl: clamp(1.7rem, 2.125vw + 0.85rem, 3.4rem);
+    --font-size-3xl: clamp(2.55rem, 2.7625vw + 0.85rem, 3.4rem);
+    --font-size-4xl: clamp(3.4rem, 3.1875vw + 0.85rem, 3.4rem);
 
     /* Line Heights */
     --line-height-tight: 1.25;
@@ -158,7 +158,7 @@
     height: 100% !important;
     min-height: 600px !important;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
-    font-size: 16px !important;
+    font-size: 13.6px !important;
     line-height: 1.5 !important;
     color: var(--text-primary) !important;
     background-color: var(--bg-body) !important;
@@ -206,8 +206,8 @@
    SIDEBAR
    ================================================ */
 .giannis-chatbot-wrapper .sidebar {
-    width: 280px !important;
-    max-width: 280px !important;
+    width: 238px !important;
+    max-width: 238px !important;
     height: 100% !important;
     background-color: var(--bg-sidebar) !important;
     color: var(--text-on-dark) !important;
@@ -228,18 +228,18 @@
 .giannis-chatbot-wrapper .logo-container {
     display: flex !important;
     align-items: center !important;
-    gap: 14px !important;
-    margin-bottom: 2rem !important;
+    gap: 12px !important;
+    margin-bottom: 1.7rem !important;
     padding: 0 0.5rem !important;
     height: auto !important;
     width: 100% !important;
 }
 
 .giannis-chatbot-wrapper .logo-icon {
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
+    width: 37px !important;
+    height: 37px !important;
+    min-width: 37px !important;
+    min-height: 37px !important;
     border-radius: var(--radius-md) !important;
     display: flex !important;
     align-items: center !important;
@@ -287,12 +287,12 @@
     color: var(--irc-white) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: var(--radius-sm) !important;
-    padding: 14px !important;
+    padding: 12px !important;
     display: flex !important;
     align-items: center !important;
-    gap: 12px !important;
+    gap: 10px !important;
     font-weight: 500 !important;
-    font-size: 14px !important;
+    font-size: 12px !important;
     font-family: inherit !important;
     cursor: pointer !important;
     transition: all var(--transition-base);
@@ -314,8 +314,8 @@
 }
 
 .giannis-chatbot-wrapper .new-chat-btn svg {
-    width: 18px !important;
-    height: 18px !important;
+    width: 15px !important;
+    height: 15px !important;
     flex-shrink: 0 !important;
 }
 
@@ -325,10 +325,10 @@
     border: 1px solid rgba(255, 194, 14, 0.3) !important;
     color: var(--irc-white) !important;
     border-radius: var(--radius-sm) !important;
-    padding: 14px !important;
+    padding: 12px !important;
     display: flex !important;
     align-items: center !important;
-    gap: 12px !important;
+    gap: 10px !important;
     font-weight: 500 !important;
     font-size: var(--font-size-sm) !important;
     font-family: inherit !important;
@@ -374,8 +374,8 @@
 }
 
 .giannis-chatbot-wrapper .feedback-btn svg {
-    width: 16px !important;
-    height: 16px !important;
+    width: 14px !important;
+    height: 14px !important;
     flex-shrink: 0 !important;
 }
 
@@ -710,8 +710,8 @@
    ================================================ */
 .giannis-chatbot-wrapper .message {
     display: flex !important;
-    gap: 1.5rem !important;
-    padding: 0 2rem !important;
+    gap: 1.275rem !important;
+    padding: 0 1.7rem !important;
     max-width: 900px !important;
     margin: 0 auto !important;
     width: 100% !important;
@@ -732,10 +732,10 @@
 
 /* Message Avatar */
 .giannis-chatbot-wrapper .message-avatar {
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
+    width: 37px !important;
+    height: 37px !important;
+    min-width: 37px !important;
+    min-height: 37px !important;
     border-radius: 50% !important;
     display: flex !important;
     align-items: center !important;
@@ -1049,10 +1049,10 @@ body.dark-mode .starter-chip:hover {
     backdrop-filter: blur(20px) !important;
     border-radius: var(--radius-lg) !important;
     border: 1px solid var(--border-light) !important;
-    padding: 12px 16px !important;
+    padding: 10px 14px !important;
     display: flex !important;
     align-items: flex-end !important;
-    gap: 12px !important;
+    gap: 10px !important;
     transition: all var(--transition-base);
     box-shadow: var(--shadow-md) !important;
 }
