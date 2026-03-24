@@ -898,11 +898,19 @@
     margin-bottom: 6px !important;
 }
 
-/* Ordered list inside sources */
+/* Ordered and unordered lists inside sources */
+.giannis-chatbot-wrapper .message-sources ul,
 .giannis-chatbot-wrapper .message-sources ol {
     margin: 0 !important;
     padding-left: 20px !important;
+}
+
+.giannis-chatbot-wrapper .message-sources ol {
     list-style-type: decimal !important;
+}
+
+.giannis-chatbot-wrapper .message-sources ul {
+    list-style-type: disc !important;
 }
 
 .giannis-chatbot-wrapper .message-sources li {
@@ -915,6 +923,27 @@
 
 .giannis-chatbot-wrapper.dark-mode .message-sources li {
     color: #aaaaaa !important;
+}
+
+/* Lists inside bot message bubbles */
+.giannis-chatbot-wrapper .message-content ul,
+.giannis-chatbot-wrapper .message-content ol {
+    padding-left: 1.5em !important;
+    margin-top: 0.5em !important;
+    margin-bottom: 0.5em !important;
+}
+
+.giannis-chatbot-wrapper .message-content ul {
+    list-style-type: disc !important;
+}
+
+.giannis-chatbot-wrapper .message-content ol {
+    list-style-type: decimal !important;
+}
+
+.giannis-chatbot-wrapper .message-content li {
+    margin-bottom: 0.25em !important;
+    line-height: var(--line-height-relaxed) !important;
 }
 
 /* ================================================
