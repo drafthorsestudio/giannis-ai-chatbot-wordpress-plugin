@@ -976,7 +976,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     function parseContent(text) {
         if (!text) return "";
 
-        const sourceRegex = /(\n\s*(?:Sources?|Fonti):[\s\S]*)$/i;
+        // Match "Sources:" / "Source:" / "Fonti:" at the very start of the string
+        // OR after a newline. Also handles bold-wrapped labels like **Sources:**
+        const sourceRegex = /((?:^|\n)\s*\*{0,2}(?:Sources?|Fonti)\*{0,2}:[\s\S]*)$/i;
         const match = text.match(sourceRegex);
 
         let mainText = text;
@@ -991,9 +993,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (sourcesText) {
             const cleanSources = sourcesText.trim();
-            const formattedSources = formatMarkdown(cleanSources);
 
-            html += `<div class="message-sources">${formattedSources}</div>`;
+            // Strip the label ("Sources:", "Fonti:", optionally wrapped in **)
+            const labelMatch = cleanSources.match(/^\*{0,2}(?:Sources?|Fonti)\*{0,2}:\s*/i);
+            const itemsRaw = labelMatch ? cleanSources.slice(labelMatch[0].length).trim() : cleanSources;
+
+            // Split on commas or newlines; trim and drop blank entries
+            const items = itemsRaw
+                .split(/[\n,]+/)
+                .map(s => s.trim())
+                .filter(s => s.length > 0);
+
+            // HTML-escape a reusable temp node
+            const t = document.createElement('div');
+            let sourcesHtml = '<span class="sources-label">Sources</span>';
+            if (items.length > 0) {
+                sourcesHtml += '<ol>' + items.map(item => {
+                    t.textContent = item;
+                    return `<li>${t.innerHTML}</li>`;
+                }).join('') + '</ol>';
+            }
+
+            html += `<div class="message-sources">${sourcesHtml}</div>`;
         }
 
         return html;
@@ -1002,15 +1023,77 @@ document.addEventListener('DOMContentLoaded', async () => {
     function formatMarkdown(text) {
         if (!text) return "";
 
+        // HTML-escape via DOM to prevent XSS
         const temp = document.createElement('div');
         temp.textContent = text;
         let html = temp.innerHTML;
 
+        // Bold: **text**
         html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-        html = html.replace(/\n/g, '<br>');
 
-        return html;
+        // Markdown links: [label](url) → <a href="url">label</a>
+        html = html.replace(
+            /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
+            '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+        );
+
+        // Bare URLs: preceded by start-of-string, whitespace, or '(' — not inside an attribute
+        html = html.replace(
+            /(^|[\s(])(https?:\/\/[^\s<>"')\]]+)/g,
+            (m, prefix, url) => `${prefix}<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+        );
+
+        // Italic: *text* — single asterisk, not a list marker (* item) or part of **
+        html = html.replace(/(?<!\*)\*(?!\*|\s)([^*\n]+?)(?<!\s)\*(?!\*)/g, '<em>$1</em>');
+
+        // Process lines: group list items into <ul>/<ol>, convert remaining \n to <br>
+        const lines = html.split('\n');
+        const result = []; // {type: 'text'|'block', content: string}
+        let listType = null;
+        let listItems = [];
+
+        const flushList = () => {
+            if (listType && listItems.length > 0) {
+                result.push({ type: 'block', content: `<${listType}>${listItems.join('')}</${listType}>` });
+                listItems = [];
+                listType = null;
+            }
+        };
+
+        for (const line of lines) {
+            const ulMatch = line.match(/^[ \t]*[-*][ \t]+(.+)$/);
+            const olMatch = !ulMatch && line.match(/^[ \t]*\d+\.[ \t]+(.+)$/);
+
+            if (ulMatch) {
+                if (listType === 'ol') flushList();
+                listType = 'ul';
+                listItems.push(`<li>${ulMatch[1]}</li>`);
+            } else if (olMatch) {
+                if (listType === 'ul') flushList();
+                listType = 'ol';
+                listItems.push(`<li>${olMatch[1]}</li>`);
+            } else {
+                flushList();
+                result.push({ type: 'text', content: line });
+            }
+        }
+        flushList();
+
+        // Join: add <br> between text lines; block elements (lists) sit inline without extra <br>
+        let finalHtml = '';
+        for (let i = 0; i < result.length; i++) {
+            const item = result[i];
+            const prev = result[i - 1];
+            if (item.type === 'block') {
+                if (prev && prev.type === 'text' && prev.content !== '') finalHtml += '<br>';
+                finalHtml += item.content;
+            } else {
+                if (prev) finalHtml += '<br>';
+                finalHtml += item.content;
+            }
+        }
+
+        return finalHtml;
     }
 
     function initializeTheme() {
