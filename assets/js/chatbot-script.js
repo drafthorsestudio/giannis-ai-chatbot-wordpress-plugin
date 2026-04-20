@@ -250,12 +250,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const clearAllBtn = document.getElementById('chatbot-clear-all');
     if (clearAllBtn) {
         clearAllBtn.addEventListener('click', () => {
-            if (confirm('Sei sicuro di voler cancellare tutte le conversazioni? Questa azione non può essere annullata.')) {
+            if (confirm(giannisConfig.i18n.confirmClearAll)) {
                 chats = [];
                 localStorage.removeItem('giannis_chats');
                 renderSidebar();
                 startNewChat();
-                console.log('✅ Tutte le chat sono state cancellate');
+                console.log('✅ All chats have been cleared');
             }
         });
     }
@@ -525,7 +525,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function deleteChat(chatId) {
-        if (confirm('Are you sure you want to delete this chat?')) {
+        if (confirm(giannisConfig.i18n.confirmDeleteChat)) {
             chats = chats.filter(c => c.id !== chatId);
             saveChats();
 
@@ -770,11 +770,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             </button>
         ` : '';
 
+        const deleteButton = `
+            <button type="button" class="delete-msg-btn" title="${giannisConfig.i18n.deleteMessage || 'Delete message'}" onclick="deleteIndividualMessage(this)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        `;
+
         messageDiv.innerHTML = `
             <div class="message-avatar">${avatar}</div>
             <div class="message-content">
                 ${copyButton}
             </div>
+            ${deleteButton}
         `;
 
         const delay = messageAnimationIndex * 100;
@@ -951,19 +961,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    let _scrollRAF = null;
+    let _windowScrollTimer = null;
     function scrollToBottom() {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        // Use rAF for smooth container scroll (prevents Safari layout thrashing)
+        if (_scrollRAF) cancelAnimationFrame(_scrollRAF);
+        _scrollRAF = requestAnimationFrame(() => {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
 
-        const headerOffset = getHeaderOffset();
-        const chatBottom = chatMessages.getBoundingClientRect().bottom;
-
-        if (chatBottom > window.innerHeight) {
-            const scrollTarget = window.pageYOffset + (chatBottom - window.innerHeight) + 20;
-            window.scrollTo({
-                top: scrollTarget - headerOffset,
-                behavior: 'smooth'
-            });
-        }
+        // Debounce window scroll to prevent viewport jumping during typewriter
+        if (_windowScrollTimer) clearTimeout(_windowScrollTimer);
+        _windowScrollTimer = setTimeout(() => {
+            const chatBottom = chatMessages.getBoundingClientRect().bottom;
+            if (chatBottom > window.innerHeight) {
+                const headerOffset = getHeaderOffset();
+                const scrollTarget = window.pageYOffset + (chatBottom - window.innerHeight) + 20;
+                window.scrollTo({
+                    top: scrollTarget - headerOffset,
+                    behavior: 'smooth'
+                });
+            }
+        }, 300);
     }
 
     function getHeaderOffset() {
@@ -1060,18 +1079,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         };
 
-        for (const line of lines) {
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].replace(/\r$/, '');
+            const trimmedLine = line.trim();
             const ulMatch = line.match(/^[ \t]*[-*][ \t]+(.+)$/);
             const olMatch = !ulMatch && line.match(/^[ \t]*\d+\.[ \t]+(.+)$/);
 
             if (ulMatch) {
                 if (listType === 'ol') flushList();
                 listType = 'ul';
-                listItems.push(`<li>${ulMatch[1]}</li>`);
+                listItems.push(`<li>${ulMatch[1].replace(/\r$/, '')}</li>`);
             } else if (olMatch) {
                 if (listType === 'ul') flushList();
                 listType = 'ol';
-                listItems.push(`<li>${olMatch[1]}</li>`);
+                listItems.push(`<li>${olMatch[1].replace(/\r$/, '')}</li>`);
+            } else if (trimmedLine === '' && listType) {
+                // Blank line inside a list: skip to keep items grouped
+                // under a single <ol>/<ul> and prevent counter reset
+                continue;
             } else {
                 flushList();
                 result.push({ type: 'text', content: line });
@@ -1214,6 +1239,31 @@ window.copyToClipboard = function (button) {
         }
         document.body.removeChild(textArea);
     });
+};
+
+// Global Delete Individual Message Function (syncs localStorage on deletion)
+window.deleteIndividualMessage = function(button) {
+    const messageDiv = button.closest('.message');
+    if (!messageDiv) return;
+
+    const chatMessagesEl = document.getElementById('chatMessages');
+    const allMessages = Array.from(chatMessagesEl.querySelectorAll('.message:not([id^="typing-"])'));
+    const msgIndex = allMessages.indexOf(messageDiv);
+
+    // Remove from localStorage chat history so API payloads stay in sync
+    if (msgIndex !== -1 && currentChatId) {
+        const chatIndex = chats.findIndex(c => c.id === currentChatId);
+        if (chatIndex !== -1 && chats[chatIndex].messages[msgIndex] !== undefined) {
+            chats[chatIndex].messages.splice(msgIndex, 1);
+            localStorage.setItem('giannis_chats', JSON.stringify(chats));
+        }
+    }
+
+    // Animate removal from DOM
+    messageDiv.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    messageDiv.style.opacity = '0';
+    messageDiv.style.transform = 'translateX(-20px)';
+    setTimeout(() => messageDiv.remove(), 300);
 };
 
 // GA4 Button Tracking

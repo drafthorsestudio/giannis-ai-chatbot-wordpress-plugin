@@ -76,7 +76,7 @@ $plugin_url = GIANNIS_CHATBOT_PLUGIN_URL;
                 </button>
                 
                 <!-- Clear All Chats Button -->
-                <button type="button" class="clear-all-btn" id="chatbot-clear-all" title="<?php esc_attr_e('Cancella tutte le chat', 'giannis-ai-chatbot'); ?>">
+                <button type="button" class="clear-all-btn" id="chatbot-clear-all" title="<?php esc_attr_e('Clear all chats', 'giannis-ai-chatbot'); ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="3 6 5 6 21 6"></polyline>

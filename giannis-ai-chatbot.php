@@ -83,11 +83,16 @@ class Giannis_AI_Chatbot {
                 true
             );
             
-            // Pass configuration
+            // Pass configuration and localized strings
             wp_localize_script('giannis-chatbot-script', 'giannisConfig', array(
                 'apiUrl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('giannis_chatbot_nonce'),
-                'pluginUrl' => GIANNIS_CHATBOT_PLUGIN_URL
+                'pluginUrl' => GIANNIS_CHATBOT_PLUGIN_URL,
+                'i18n' => array(
+                    'confirmClearAll'  => __('Are you sure you want to delete all conversations? This action cannot be undone.', 'giannis-ai-chatbot'),
+                    'confirmDeleteChat' => __('Are you sure you want to delete this chat?', 'giannis-ai-chatbot'),
+                    'deleteMessage'    => __('Delete message', 'giannis-ai-chatbot'),
+                )
             ));
         }
     }
